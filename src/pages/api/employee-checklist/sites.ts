@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Basic caching for faster dropdown loads
     res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
     return res.status(200).json(sites || []);
-  } catch (error) {
+  } catch {
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const seen = new Set<number>();
     const employees = [] as Array<{ id: number; full_name: string }>;
     for (const row of data || []) {
-      const emp = (row as any).app_employees;
+      const emp = (row as Record<string, unknown>).app_employees as { id: number; full_name: string };
       if (emp && !seen.has(emp.id)) {
         seen.add(emp.id);
         employees.push(emp);
@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
     return res.status(200).json(employees);
-  } catch (error) {
+  } catch {
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

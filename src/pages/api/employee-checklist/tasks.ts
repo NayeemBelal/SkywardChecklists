@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .select('id, name')
       .eq('site_id', siteIdNum);
     if (siteZonesErr) return res.status(500).json({ error: 'Failed to fetch site zones' });
-    const siteZoneIds = (siteZones || []).map((z: any) => z.id);
+    const siteZoneIds = (siteZones || []).map((z: { id: number; name: string }) => z.id);
 
     if (siteZoneIds.length === 0) {
       return res.status(200).json([]);
@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .in('zone_id', siteZoneIds);
     if (siteRoomsErr) return res.status(500).json({ error: 'Failed to fetch site rooms' });
     const roomIdToRoom: Record<number, { id: number; name: string; zone_id: number }> = {};
-    const siteRoomIds = (siteRooms || []).map((r: any) => {
+    const siteRoomIds = (siteRooms || []).map((r: { id: number; name: string; zone_id: number }) => {
       roomIdToRoom[r.id] = { id: r.id, name: r.name, zone_id: r.zone_id };
       return r.id;
     });
@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .eq('employee_id', employeeIdNum)
       .in('room_id', siteRoomIds);
     if (empRoomErr) return res.status(500).json({ error: 'Failed to fetch room assignments' });
-    const empRoomIds = (empRoomAssign || []).map((r: any) => r.room_id);
+    const empRoomIds = (empRoomAssign || []).map((r: { room_id: number }) => r.room_id);
 
     // 4) Employee's zone assignments (restricted to site)
     const { data: empZoneAssign, error: empZoneErr } = await supabase
@@ -63,12 +63,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .eq('employee_id', employeeIdNum)
       .in('zone_id', siteZoneIds);
     if (empZoneErr) return res.status(500).json({ error: 'Failed to fetch zone assignments' });
-    const empZoneIds = (empZoneAssign || []).map((z: any) => z.zone_id);
+    const empZoneIds = (empZoneAssign || []).map((z: { zone_id: number }) => z.zone_id);
 
     // 5) Allowed rooms = directly assigned rooms ∪ rooms in assigned zones
     const roomsFromZones = (siteRooms || [])
-      .filter((r: any) => empZoneIds.includes(r.zone_id))
-      .map((r: any) => r.id);
+      .filter((r: { id: number; name: string; zone_id: number }) => empZoneIds.includes(r.zone_id))
+      .map((r: { id: number; name: string; zone_id: number }) => r.id);
     const allowedRoomIdSet = new Set<number>([...empRoomIds, ...roomsFromZones]);
     const allowedRoomIds = Array.from(allowedRoomIdSet);
 
@@ -86,9 +86,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 7) Map to response with room and zone names
     const zoneIdToZone = new Map<number, { id: number; name: string }>();
-    for (const z of siteZones || []) zoneIdToZone.set(z.id, { id: z.id, name: (z as any).name });
+    for (const z of siteZones || []) zoneIdToZone.set(z.id, { id: z.id, name: z.name });
 
-    const response = (taskRows || []).map((t: any) => {
+    const response = (taskRows || []).map((t: { id: number; description: string; room_id: number }) => {
       const room = roomIdToRoom[t.room_id];
       const zone = room ? zoneIdToZone.get(room.zone_id) || null : null;
       return {
@@ -100,7 +100,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     return res.status(200).json(response);
-  } catch (error) {
+  } catch {
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

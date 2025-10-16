@@ -84,6 +84,7 @@ export const EmployeeTab: React.FC<EmployeeTabProps> = ({
     setAssignedCurrentPage(1); // Reset to first page when site or target changes
     setUnassignedCurrentPage(1);
     loadEmployees(1, 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [siteId, targetId]); // Removed loadEmployees from dependencies to prevent infinite loop
 
   const handleAssignedPageChange = (page: number) => {

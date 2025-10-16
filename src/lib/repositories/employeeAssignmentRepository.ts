@@ -1,5 +1,5 @@
 import { supabase, getSupabaseAdmin } from '@/lib/supabase';
-import { Employee, EmployeeAssignmentDetails, Task, Zone, Room, Site } from '@skyward/shared';
+import { Employee, EmployeeAssignmentDetails, Task, Zone, Room } from '@skyward/shared';
 import type { EmployeeAssignmentHierarchy } from '@skyward/shared/src/types';
 
 export class EmployeeAssignmentRepository {
