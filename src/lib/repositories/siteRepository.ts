@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { Site } from '@skyward/shared';
+import { Site } from '@/types';
 
 export class SiteRepository {
   async findAll(): Promise<Site[]> {

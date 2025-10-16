@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Site, Zone } from '@skyward/shared';
+import { Site, Zone } from '@/types';
 import { useSites } from '@/hooks/useSites';
 import { useZones } from '@/hooks/useZones';
 import { ZoneList } from '@/components/admin/ZoneList';

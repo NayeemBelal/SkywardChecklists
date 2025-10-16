@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Site, SiteFormData } from '@skyward/shared';
+import { Site, SiteFormData } from '@/types';
 import { siteService } from '@/services/siteService';
 
 export function useSites() {

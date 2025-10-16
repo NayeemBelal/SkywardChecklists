@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zone } from '@skyward/shared';
+import { Zone } from '@/types';
 
 interface ZoneListProps {
   zones: Zone[];

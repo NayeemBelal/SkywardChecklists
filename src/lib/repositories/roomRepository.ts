@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { Room } from '@skyward/shared';
+import { Room } from '@/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export class RoomRepository {

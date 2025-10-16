@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Employee, EmployeeAssignmentDetails } from '@skyward/shared';
+import { Employee, EmployeeAssignmentDetails } from '@/types';
 import { EmployeeSearchBar } from './EmployeeSearchBar';
 import { EmployeeAssignmentModal } from './EmployeeAssignmentModal';
 import { EmployeeAssignmentDetailsModal } from './EmployeeAssignmentDetailsModal';

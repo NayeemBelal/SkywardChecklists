@@ -1,4 +1,4 @@
-import { Employee, EmployeeAssignmentDetails, EmployeeAssignmentHierarchy } from '@skyward/shared';
+import { Employee, EmployeeAssignmentDetails, EmployeeAssignmentHierarchy } from '@/types';
 
 const API_BASE = '/api';
 

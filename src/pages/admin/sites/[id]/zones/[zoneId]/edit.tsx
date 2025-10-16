@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Site, Zone, Room, Task } from '@skyward/shared';
+import { Site, Zone, Room, Task } from '@/types';
 import { useSites } from '@/hooks/useSites';
 import { useZones } from '@/hooks/useZones';
 import { useRooms } from '@/hooks/useRooms';
@@ -13,7 +13,7 @@ import { TaskForm } from '@/components/admin/TaskForm';
 import { TaskDeleteModal } from '@/components/admin/TaskDeleteModal';
 import TemplateModal from '@/components/admin/TemplateModal';
 import { RoomFormData } from '@/services/roomService';
-import { TaskFormData } from '@skyward/shared';
+import { TaskFormData } from '@/types';
 
 export default function EditZonePage() {
   const router = useRouter();

@@ -1,6 +1,6 @@
 import { supabase, getSupabaseAdmin } from '@/lib/supabase';
-import { Employee, EmployeeAssignmentDetails, Task, Zone, Room } from '@skyward/shared';
-import type { EmployeeAssignmentHierarchy } from '@skyward/shared/src/types';
+import { Employee, EmployeeAssignmentDetails, Task, Zone, Room } from '@/types';
+import type { EmployeeAssignmentHierarchy } from '@/types';
 
 export class EmployeeAssignmentRepository {
   async assignEmployeeToZone(employeeId: number, zoneId: number): Promise<void> {

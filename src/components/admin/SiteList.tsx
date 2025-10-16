@@ -1,5 +1,5 @@
 import React from 'react';
-import { Site } from '@skyward/shared';
+import { Site } from '@/types';
 
 interface SiteListProps {
   sites: Site[];

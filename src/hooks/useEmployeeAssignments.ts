@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Employee, EmployeeAssignmentDetails, EmployeeAssignmentHierarchy } from '@skyward/shared';
+import { Employee, EmployeeAssignmentDetails, EmployeeAssignmentHierarchy } from '@/types';
 import { EmployeeAssignmentService } from '@/services/employeeAssignmentService';
 
 export const useEmployeeAssignments = () => {

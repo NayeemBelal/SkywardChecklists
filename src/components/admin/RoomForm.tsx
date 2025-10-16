@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Room } from '@skyward/shared';
+import { Room } from '@/types';
 import { RoomFormData } from '@/services/roomService';
 
 interface RoomFormProps {

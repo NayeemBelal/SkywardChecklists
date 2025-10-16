@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { Site, SiteFormData, Zone, Employee, EmployeeAssignmentHierarchy } from '@skyward/shared';
+import { Site, SiteFormData, Zone, Employee, EmployeeAssignmentHierarchy } from '@/types';
 import { useSites } from '@/hooks/useSites';
 import { useZones } from '@/hooks/useZones';
 import { useEmployeeAssignments } from '@/hooks/useEmployeeAssignments';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Employee } from '@skyward/shared';
+import { Employee } from '@/types';
 import { EmployeeSearchBar } from './EmployeeSearchBar';
 
 interface EmployeeAssignmentModalProps {

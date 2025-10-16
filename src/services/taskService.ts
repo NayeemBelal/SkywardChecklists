@@ -1,4 +1,4 @@
-import { Task, TaskFormData } from '@skyward/shared';
+import { Task, TaskFormData } from '@/types';
 
 const API_BASE_URL = '/api/tasks';
 

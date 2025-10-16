@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { TaskTemplate } from '@skyward/shared';
+import { TaskTemplate } from '@/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export class TaskTemplateRepository {

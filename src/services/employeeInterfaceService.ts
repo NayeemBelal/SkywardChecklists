@@ -1,4 +1,4 @@
-import { Site, Employee } from '@skyward/shared';
+import { Site, Employee } from '@/types';
 
 export const employeeInterfaceService = {
   async getSites(): Promise<Pick<Site, 'id' | 'name'>[]> {

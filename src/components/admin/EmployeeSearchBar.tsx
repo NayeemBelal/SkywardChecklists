@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Employee } from '@skyward/shared';
+import { Employee } from '@/types';
 
 interface EmployeeSearchBarProps {
   employees: Employee[];

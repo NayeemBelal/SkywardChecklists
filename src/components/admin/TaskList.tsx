@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Task } from '@skyward/shared';
+import { Task } from '@/types';
 import {
   DndContext,
   closestCenter,

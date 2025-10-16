@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Site, Employee } from '@skyward/shared';
+import { Site, Employee } from '@/types';
 import { employeeInterfaceService } from '@/services/employeeInterfaceService';
 
 export function useEmployeeInterface() {

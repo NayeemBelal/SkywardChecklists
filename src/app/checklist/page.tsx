@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { employeeInterfaceService } from '@/services/employeeInterfaceService';
 
-export default function ChecklistPage() {
+function ChecklistContent() {
   const params = useSearchParams();
   const router = useRouter();
   const siteIdParam = params?.get('siteId');
@@ -134,4 +134,18 @@ export default function ChecklistPage() {
   );
 }
 
-
+export default function ChecklistPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <ChecklistContent />
+    </Suspense>
+  );
+}

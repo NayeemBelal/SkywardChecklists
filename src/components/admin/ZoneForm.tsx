@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Zone } from '@skyward/shared';
+import { Zone } from '@/types';
 import { ZoneFormData } from '@/services/zoneService';
 
 interface ZoneFormProps {

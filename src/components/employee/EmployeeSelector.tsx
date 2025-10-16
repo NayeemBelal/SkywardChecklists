@@ -1,5 +1,5 @@
 import React from 'react';
-import { Employee } from '@skyward/shared';
+import { Employee } from '@/types';
 
 interface Props {
   employees: Pick<Employee, 'id' | 'full_name'>[];

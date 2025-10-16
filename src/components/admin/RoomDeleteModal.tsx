@@ -1,5 +1,5 @@
 import React from 'react';
-import { Room } from '@skyward/shared';
+import { Room } from '@/types';
 
 interface RoomDeleteModalProps {
   room: Room | null;

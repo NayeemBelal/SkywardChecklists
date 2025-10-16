@@ -1,4 +1,4 @@
-import { Site, SiteFormData } from '@skyward/shared';
+import { Site, SiteFormData } from '@/types';
 
 const API_BASE_URL = '/api/sites';
 

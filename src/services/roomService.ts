@@ -1,4 +1,4 @@
-import { Room } from '@skyward/shared';
+import { Room } from '@/types';
 
 const API_BASE_URL = '/api/rooms';
 

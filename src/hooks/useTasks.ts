@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Task, TaskFormData } from '@skyward/shared';
+import { Task, TaskFormData } from '@/types';
 import { taskService } from '@/services/taskService';
 
 export function useTasks() {

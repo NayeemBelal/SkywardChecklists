@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Site, SiteFormData } from '@skyward/shared';
+import { Site, SiteFormData } from '@/types';
 
 interface SiteFormProps {
   site?: Site | null;

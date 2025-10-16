@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Task, TaskFormData } from '@skyward/shared';
+import { Task, TaskFormData } from '@/types';
 
 interface TaskFormProps {
   task?: Task | null;

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Room } from '@skyward/shared';
+import { Room } from '@/types';
 import { roomService, RoomFormData } from '@/services/roomService';
 
 export function useRooms() {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { TaskTemplate, TaskTemplateFormData } from '@skyward/shared';
+import { TaskTemplate, TaskTemplateFormData } from '@/types';
 import { templateService } from '@/services/templateService';
 
 interface TemplateModalProps {

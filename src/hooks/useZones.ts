@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Zone } from '@skyward/shared';
+import { Zone } from '@/types';
 import { zoneService, ZoneFormData } from '@/services/zoneService';
 
 export function useZones() {

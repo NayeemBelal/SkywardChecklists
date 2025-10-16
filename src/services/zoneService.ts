@@ -1,4 +1,4 @@
-import { Zone } from '@skyward/shared';
+import { Zone } from '@/types';
 
 const API_BASE_URL = '/api/zones';
 

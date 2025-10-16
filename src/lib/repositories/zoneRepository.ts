@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { Zone } from '@skyward/shared';
+import { Zone } from '@/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export class ZoneRepository {

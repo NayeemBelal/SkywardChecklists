@@ -1,4 +1,4 @@
-import { TaskTemplate, TaskTemplateFormData } from '@skyward/shared';
+import { TaskTemplate, TaskTemplateFormData } from '@/types';
 
 const API_BASE_URL = '/api/task-templates';
 

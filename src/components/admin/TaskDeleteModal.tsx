@@ -1,5 +1,5 @@
 import React from 'react';
-import { Task } from '@skyward/shared';
+import { Task } from '@/types';
 
 interface TaskDeleteModalProps {
   task: Task | null;
