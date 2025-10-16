@@ -6,8 +6,8 @@ import { employeeInterfaceService } from '@/services/employeeInterfaceService';
 export default function ChecklistPage() {
   const params = useSearchParams();
   const router = useRouter();
-  const siteIdParam = params.get('siteId');
-  const employeeIdParam = params.get('employeeId');
+  const siteIdParam = params?.get('siteId');
+  const employeeIdParam = params?.get('employeeId');
   const siteId = siteIdParam ? Number(siteIdParam) : null;
   const employeeId = employeeIdParam ? Number(employeeIdParam) : null;
 
