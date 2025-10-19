@@ -532,3 +532,10 @@ export default function EditZonePage() {
     </div>
   );
 }
+
+// Make this page dynamic to prevent static generation issues
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}

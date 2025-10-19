@@ -512,3 +512,10 @@ export default function SitesPage() {
     </div>
   );
 }
+
+// Make this page dynamic to prevent static generation issues
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
