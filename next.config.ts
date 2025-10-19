@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   // Disable x-powered-by header for security
@@ -13,7 +14,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['@supabase/supabase-js'],
   
   // Set output file tracing root to avoid lockfile warnings
-  outputFileTracingRoot: '.',
+  outputFileTracingRoot: path.resolve(__dirname),
 };
 
 export default nextConfig;

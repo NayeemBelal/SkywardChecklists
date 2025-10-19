@@ -11,13 +11,6 @@
   
   # Next.js specific environment variables
   NEXT_TELEMETRY_DISABLED = "1"
-  
-  # Build environment
-  NODE_ENV = "production"
-
-# Functions configuration for API routes
-[functions]
-  directory = ".next/serverless"
 
 # Headers for security and performance
 [[headers]]
