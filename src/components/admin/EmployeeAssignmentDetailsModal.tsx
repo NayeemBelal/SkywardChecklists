@@ -109,6 +109,7 @@ export const EmployeeAssignmentDetailsModal: React.FC<EmployeeAssignmentDetailsM
   const currentSite = selectedSiteIndex !== null ? sites[selectedSiteIndex] : null;
   const currentZone = currentSite && selectedZoneIndex !== null ? currentSite.zones[selectedZoneIndex] : null;
 
+  
   // Determine breadcrumb
   const breadcrumb = [];
   if (selectedSiteIndex !== null) {
