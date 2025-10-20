@@ -3,9 +3,6 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { employeeInterfaceService } from '@/services/employeeInterfaceService';
 
-// Force dynamic rendering to avoid prerender conflicts with Pages Router
-export const dynamic = 'force-dynamic';
-
 function ChecklistContent() {
   const params = useSearchParams();
   const router = useRouter();

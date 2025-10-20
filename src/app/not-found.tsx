@@ -1,8 +1,5 @@
 import Link from 'next/link';
 
-// Force dynamic rendering to avoid prerender conflicts with Pages Router
-export const dynamic = 'force-dynamic';
-
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">

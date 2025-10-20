@@ -5,9 +5,6 @@ import { useEmployeeInterface } from '@/hooks/useEmployeeInterface';
 import { SiteSelector } from '@/components/employee/SiteSelector';
 import { EmployeeSelector } from '@/components/employee/EmployeeSelector';
 
-// Force dynamic rendering to avoid prerender conflicts with Pages Router
-export const dynamic = 'force-dynamic';
-
 export default function Home() {
   const router = useRouter();
   const { sites, employees, selectedSite, setSelectedSite, loading, error } = useEmployeeInterface();
