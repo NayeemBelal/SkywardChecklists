@@ -17,3 +17,8 @@ export default function Custom404() {
   );
 }
 
+// Force SSR to prevent Html import conflicts with App Router
+export async function getServerSideProps() {
+  return { props: {} };
+}
+
