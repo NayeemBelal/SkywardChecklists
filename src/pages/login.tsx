@@ -119,3 +119,8 @@ export default function LoginPage() {
     </div>
   );
 }
+
+// Force SSR to prevent NextRouter not mounted error during build
+export async function getServerSideProps() {
+  return { props: {} };
+}
