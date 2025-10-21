@@ -5,6 +5,7 @@ import { useSites } from '@/hooks/useSites';
 import { useZones } from '@/hooks/useZones';
 import { useRooms } from '@/hooks/useRooms';
 import { useTasks } from '@/hooks/useTasks';
+import { useRoomTemplates } from '@/hooks/useRoomTemplates';
 import { RoomList } from '@/components/admin/RoomList';
 import { RoomForm } from '@/components/admin/RoomForm';
 import { RoomDeleteModal } from '@/components/admin/RoomDeleteModal';
@@ -12,16 +13,20 @@ import { TaskList } from '@/components/admin/TaskList';
 import { TaskForm } from '@/components/admin/TaskForm';
 import { TaskDeleteModal } from '@/components/admin/TaskDeleteModal';
 import TemplateModal from '@/components/admin/TemplateModal';
+import { RoomTemplateSelector } from '@/components/admin/RoomTemplateSelector';
 import { RoomFormData } from '@/services/roomService';
 import { TaskFormData } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 export default function EditZonePage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { id: siteId, zoneId } = router.query;
   const { sites } = useSites();
   const { zones, fetchZonesBySite } = useZones();
   const { rooms, loading, error, createRoom, updateRoom, deleteRoom, fetchRoomsByZone } = useRooms();
   const { tasks, loading: tasksLoading, error: tasksError, createTask, updateTask, deleteTask, fetchTasksByRoom, reorderTasks } = useTasks();
+  const { useTemplate } = useRoomTemplates();
   // Removed employee assignment hooks from this page
   
   const [site, setSite] = useState<Site | null>(null);
@@ -42,6 +47,7 @@ export default function EditZonePage() {
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'rooms'>('rooms');
+  const [showRoomTemplateSelector, setShowRoomTemplateSelector] = useState(false);
 
   // Check authentication on page load
   useEffect(() => {
@@ -263,6 +269,22 @@ export default function EditZonePage() {
     }
   };
 
+  const handleUseRoomTemplate = async (templateId: number) => {
+    if (!zone) return;
+    
+    try {
+      setFormLoading(true);
+      await useTemplate(templateId, zone.id);
+      setMessage({ type: 'success', text: t('room_template_used') });
+      // Refresh rooms list
+      fetchRoomsByZone(zone.id);
+    } catch (error) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : t('operation_failed') });
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   const handleTemplateUpdated = () => {
     setMessage({ type: 'success', text: 'Template updated! Refreshing tasks...' });
     // Refresh tasks for the current room
@@ -378,12 +400,18 @@ export default function EditZonePage() {
 
         {/* Action Buttons - Only show for rooms tab */}
         {activeTab === 'rooms' && (
-          <div className="mb-6">
+          <div className="mb-6 flex gap-3">
             <button
               onClick={() => setShowRoomForm(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              Create New Room
+              {t('create_room')}
+            </button>
+            <button
+              onClick={() => setShowRoomTemplateSelector(true)}
+              className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              {t('add_template_room')}
             </button>
           </div>
         )}
@@ -526,6 +554,16 @@ export default function EditZonePage() {
             onSelectTemplate={handleSelectTemplate}
             roomId={selectedRoomId}
             onTemplateUpdated={handleTemplateUpdated}
+          />
+        )}
+
+        {/* Room Template Selector */}
+        {zone && (
+          <RoomTemplateSelector
+            isOpen={showRoomTemplateSelector}
+            onClose={() => setShowRoomTemplateSelector(false)}
+            onSelectTemplate={handleUseRoomTemplate}
+            zoneId={zone.id}
           />
         )}
       </div>

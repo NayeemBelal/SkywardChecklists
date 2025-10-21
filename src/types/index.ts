@@ -33,6 +33,7 @@ export interface Room {
   zone_id: number;
   name: string;
   description?: string;
+  room_template_id?: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -40,12 +41,14 @@ export interface Room {
 // Task types
 export interface Task {
   id: number;
-  room_id: number;
+  room_id: number | null; // Can be null for template tasks
   description: string;
   description_es?: string | null;
   task_description?: string;
   sort_order: number;
   template_id?: number;
+  room_template_id?: number | null;
+  is_template_task?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -75,6 +78,48 @@ export interface TaskTemplateFormData {
   name: string;
   description: string;
   description_es?: string | null;
+}
+
+// Room Template types
+export interface RoomTemplate {
+  id: number;
+  name: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Room Template with tasks
+export interface RoomTemplateWithTasks extends RoomTemplate {
+  tasks: RoomTemplateTask[];
+}
+
+// Room Template Task types
+export interface RoomTemplateTask {
+  id: number;
+  room_template_id: number;
+  description: string;
+  description_es?: string | null;
+  task_description?: string;
+  sort_order: number;
+  room_id?: number | null; // Can be null for template tasks
+  is_template_task?: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Room Template creation/update types (for forms)
+export interface RoomTemplateFormData {
+  name: string;
+  description?: string;
+}
+
+// Room Template Task creation/update types (for forms)
+export interface RoomTemplateTaskFormData {
+  description: string;
+  description_es?: string | null;
+  task_description?: string;
+  sort_order?: number;
 }
 
 // Task Assignment types
