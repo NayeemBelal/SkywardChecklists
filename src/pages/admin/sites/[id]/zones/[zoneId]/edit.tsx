@@ -26,7 +26,7 @@ export default function EditZonePage() {
   const { zones, fetchZonesBySite } = useZones();
   const { rooms, loading, error, createRoom, updateRoom, deleteRoom, fetchRoomsByZone } = useRooms();
   const { tasks, loading: tasksLoading, error: tasksError, createTask, updateTask, deleteTask, fetchTasksByRoom, reorderTasks } = useTasks();
-  const { useTemplate } = useRoomTemplates();
+  const { createRoomFromTemplate } = useRoomTemplates();
   // Removed employee assignment hooks from this page
   
   const [site, setSite] = useState<Site | null>(null);
@@ -274,7 +274,7 @@ export default function EditZonePage() {
     
     try {
       setFormLoading(true);
-      await useTemplate(templateId, zone.id);
+      await createRoomFromTemplate(templateId, zone.id);
       setMessage({ type: 'success', text: t('room_template_used') });
       // Refresh rooms list
       fetchRoomsByZone(zone.id);

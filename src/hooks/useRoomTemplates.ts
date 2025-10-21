@@ -52,7 +52,7 @@ export function useRoomTemplates() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [makeRequest]);
 
   const getTemplateById = useCallback(async (id: number): Promise<RoomTemplateWithTasks | null> => {
     try {
@@ -62,7 +62,7 @@ export function useRoomTemplates() {
       setError(err instanceof Error ? err.message : 'Failed to fetch template');
       return null;
     }
-  }, []);
+  }, [makeRequest]);
 
   const createTemplate = useCallback(async (
     data: RoomTemplateFormData,
@@ -82,7 +82,7 @@ export function useRoomTemplates() {
       setError(errorMessage);
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [makeRequest]);
 
   const updateTemplate = useCallback(async (
     id: number,
@@ -92,7 +92,7 @@ export function useRoomTemplates() {
   ): Promise<void> => {
     try {
       setError(null);
-      const result = await makeRequest<{ template: RoomTemplate; cascadeInfo?: any; warning?: string }>(`/api/room-templates/${id}`, {
+      const result = await makeRequest<{ template: RoomTemplate; cascadeInfo?: { cascadeUpdate: boolean; roomsUpdated: number }; warning?: string }>(`/api/room-templates/${id}`, {
         method: 'PUT',
         body: JSON.stringify({ ...data, tasks, cascadeUpdate })
       });
@@ -103,7 +103,7 @@ export function useRoomTemplates() {
       setError(errorMessage);
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [makeRequest]);
 
   const deleteTemplate = useCallback(async (id: number, cascadeDelete: boolean = false): Promise<void> => {
     try {
@@ -119,9 +119,9 @@ export function useRoomTemplates() {
       setError(errorMessage);
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [makeRequest]);
 
-  const useTemplate = useCallback(async (templateId: number, zoneId: number): Promise<{ room: Room; tasks: Task[] }> => {
+  const createRoomFromTemplate = useCallback(async (templateId: number, zoneId: number): Promise<{ room: Room; tasks: Task[] }> => {
     try {
       setError(null);
       return await makeRequest<{ room: Room; tasks: Task[] }>(`/api/room-templates/${templateId}/use`, {
@@ -133,7 +133,7 @@ export function useRoomTemplates() {
       setError(errorMessage);
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [makeRequest]);
 
   const addTaskToTemplate = useCallback(async (
     templateId: number,
@@ -150,7 +150,7 @@ export function useRoomTemplates() {
       setError(errorMessage);
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [makeRequest]);
 
   const updateTemplateTask = useCallback(async (
     taskId: number,
@@ -168,7 +168,7 @@ export function useRoomTemplates() {
       setError(errorMessage);
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [makeRequest]);
 
   const deleteTemplateTask = useCallback(async (taskId: number, cascadeDelete: boolean = false): Promise<void> => {
     try {
@@ -182,7 +182,7 @@ export function useRoomTemplates() {
       setError(errorMessage);
       throw new Error(errorMessage);
     }
-  }, []);
+  }, [makeRequest]);
 
   return {
     templates,
@@ -193,7 +193,7 @@ export function useRoomTemplates() {
     createTemplate,
     updateTemplate,
     deleteTemplate,
-    useTemplate,
+    createRoomFromTemplate,
     addTaskToTemplate,
     updateTemplateTask,
     deleteTemplateTask

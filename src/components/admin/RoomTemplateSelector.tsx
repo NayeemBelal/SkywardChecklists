@@ -11,7 +11,7 @@ interface RoomTemplateSelectorProps {
   zoneId: number;
 }
 
-export function RoomTemplateSelector({ isOpen, onClose, onSelectTemplate, zoneId }: RoomTemplateSelectorProps) {
+export function RoomTemplateSelector({ isOpen, onClose, onSelectTemplate, zoneId: _zoneId }: RoomTemplateSelectorProps) {
   const { t } = useTranslation();
   const {
     templates,
@@ -45,7 +45,7 @@ export function RoomTemplateSelector({ isOpen, onClose, onSelectTemplate, zoneId
     template.description?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleCreateTemplate = async (name: string, description: string, tasks: any[], cascadeUpdate: boolean = false) => {
+  const handleCreateTemplate = async (name: string, description: string, tasks: RoomTemplateTaskFormData[], _cascadeUpdate: boolean = false) => {
     try {
       setCreatingTemplate(true);
       await createTemplate({ name, description }, tasks);

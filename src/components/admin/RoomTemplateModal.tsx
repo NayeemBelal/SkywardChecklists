@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RoomTemplate, RoomTemplateTaskFormData, RoomTemplateWithTasks } from '@/types';
+import { RoomTemplateTaskFormData, RoomTemplateWithTasks } from '@/types';
 
 interface RoomTemplateModalProps {
   isOpen: boolean;
@@ -24,7 +24,7 @@ export function RoomTemplateModal({ isOpen, onClose, onSave, template, loading }
       if (template) {
         setName(template.name);
         setDescription(template.description || '');
-        setTasks(template.tasks.map((t, idx) => ({
+        setTasks(template.tasks.map((t) => ({
           description: t.description,
           task_description: t.task_description || '',
           tempId: `existing-${t.id}`
