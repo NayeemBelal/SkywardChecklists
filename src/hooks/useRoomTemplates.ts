@@ -11,7 +11,7 @@ export function useRoomTemplates() {
     return localStorage.getItem('supabase.auth.token');
   };
 
-  const makeRequest = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
+  const makeRequest = useCallback(async <T>(url: string, options: RequestInit = {}): Promise<T> => {
     const token = getAuthToken();
     
     const response = await fetch(url, {
@@ -39,7 +39,7 @@ export function useRoomTemplates() {
     }
 
     return response.json();
-  };
+  }, []);
 
   const fetchTemplates = useCallback(async () => {
     try {

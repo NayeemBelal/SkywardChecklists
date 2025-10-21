@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RoomTemplate, RoomTemplateWithTasks } from '@/types';
+import { RoomTemplate, RoomTemplateWithTasks, RoomTemplateTaskFormData } from '@/types';
 import { useRoomTemplates } from '@/hooks/useRoomTemplates';
 import { RoomTemplateModal } from './RoomTemplateModal';
 
