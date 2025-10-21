@@ -11,7 +11,7 @@ interface RoomTemplateSelectorProps {
   zoneId: number;
 }
 
-export function RoomTemplateSelector({ isOpen, onClose, onSelectTemplate, zoneId: _zoneId }: RoomTemplateSelectorProps) {
+export function RoomTemplateSelector({ isOpen, onClose, onSelectTemplate }: RoomTemplateSelectorProps) {
   const { t } = useTranslation();
   const {
     templates,
@@ -28,7 +28,7 @@ export function RoomTemplateSelector({ isOpen, onClose, onSelectTemplate, zoneId
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [creatingTemplate, setCreatingTemplate] = useState(false);
   const [usingTemplate, setUsingTemplate] = useState<number | null>(null);
-  const [deletingTemplate, setDeletingTemplate] = useState<RoomTemplate | null>(null);
+  const [deletingTemplate, setDeletingTemplate] = useState<(RoomTemplate & { usageCount: number }) | null>(null);
   const [editingTemplate, setEditingTemplate] = useState<RoomTemplateWithTasks | null>(null);
   const [expandedTemplateId, setExpandedTemplateId] = useState<number | null>(null);
   const [templateDetails, setTemplateDetails] = useState<{ [key: number]: RoomTemplateWithTasks }>({});
@@ -45,7 +45,7 @@ export function RoomTemplateSelector({ isOpen, onClose, onSelectTemplate, zoneId
     template.description?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleCreateTemplate = async (name: string, description: string, tasks: RoomTemplateTaskFormData[], _cascadeUpdate: boolean = false) => {
+  const handleCreateTemplate = async (name: string, description: string, tasks: RoomTemplateTaskFormData[]) => {
     try {
       setCreatingTemplate(true);
       await createTemplate({ name, description }, tasks);
