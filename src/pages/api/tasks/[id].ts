@@ -48,10 +48,11 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
               error: 'Description is required and must be at least 1 character' 
             });
           }
-          taskUpdateData.description = updateData.description.trim();
+          const trimmedDescription = updateData.description.trim();
+          taskUpdateData.description = trimmedDescription;
           
           // Re-translate to Spanish when description changes
-          const description_es = await translateToSpanish(taskUpdateData.description);
+          const description_es = await translateToSpanish(trimmedDescription);
           taskUpdateData.description_es = description_es;
           translationWarning = description_es === null ? 'Translation to Spanish failed. Task saved in English only.' : null;
         }
