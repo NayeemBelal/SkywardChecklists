@@ -6,13 +6,27 @@ import { Translate } from '@google-cloud/translate/build/src/v2';
 import path from 'path';
 
 // Initialize the Google Cloud Translation client
-// Path to credentials file relative to the web app root
-const credentialsPath = path.join(process.cwd(), 'google-credentials.json');
+// In production (Netlify), use base64-encoded credentials from environment variable
+// In development, use local credentials file
+let translateClient: Translate;
 
-const translateClient = new Translate({
-  keyFilename: credentialsPath,
-  projectId: 'skyward-475804'
-});
+if (process.env.GOOGLE_CREDENTIALS_BASE64) {
+  // Production: decode base64 credentials from environment variable
+  const credentials = JSON.parse(
+    Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8')
+  );
+  translateClient = new Translate({
+    credentials,
+    projectId: 'skyward-475804'
+  });
+} else {
+  // Development: use local credentials file
+  const credentialsPath = path.join(process.cwd(), 'google-credentials.json');
+  translateClient = new Translate({
+    keyFilename: credentialsPath,
+    projectId: 'skyward-475804'
+  });
+}
 
 /**
  * Translate text from English to Spanish using Google Cloud Translation API
