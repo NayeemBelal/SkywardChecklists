@@ -3,12 +3,13 @@ import { withAuth } from '@/lib/middleware/auth';
 import { roomTemplateService } from '@/services/roomTemplateService';
 import { translateToSpanish } from '@/lib/serverTranslate';
 
-export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const { taskId } = req.query;
   const templateTaskId = parseInt(taskId as string);
 
   if (isNaN(templateTaskId)) {
-    return res.status(400).json({ error: 'Invalid task ID' });
+    res.status(400).json({ error: 'Invalid task ID' });
+    return;
   }
 
   try {
@@ -25,7 +26,8 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
 
         if (description !== undefined) {
           if (!description.trim()) {
-            return res.status(400).json({ error: 'Description cannot be empty' });
+            res.status(400).json({ error: 'Description cannot be empty' });
+            return;
           }
           updates.description = description.trim();
           
@@ -52,7 +54,7 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           success: true,
           warning: translationWarning
         });
-        break;
+        return;
 
       case 'DELETE':
         const { cascadeDelete } = req.body;
@@ -62,11 +64,12 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           cascadeDelete || false
         );
         res.status(200).json({ success: true });
-        break;
+        return;
 
       default:
         res.setHeader('Allow', ['PUT', 'DELETE']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
+        return;
     }
   } catch (error) {
     console.error('Room Template Task API Error:', error);
@@ -74,6 +77,7 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
+    return;
   }
 });
 

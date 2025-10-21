@@ -3,12 +3,13 @@ import { withAuth } from '@/lib/middleware/auth';
 import { roomTemplateService } from '@/services/roomTemplateService';
 import { translateToSpanish } from '@/lib/serverTranslate';
 
-export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const { id } = req.query;
   const templateId = parseInt(id as string);
 
   if (isNaN(templateId)) {
-    return res.status(400).json({ error: 'Invalid template ID' });
+    res.status(400).json({ error: 'Invalid template ID' });
+    return;
   }
 
   try {
@@ -16,19 +17,21 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
       case 'GET':
         const template = await roomTemplateService.getTemplateById(templateId);
         if (!template) {
-          return res.status(404).json({ error: 'Template not found' });
+          res.status(404).json({ error: 'Template not found' });
+          return;
         }
         res.status(200).json(template);
-        break;
+        return;
 
       case 'PUT':
         const { name, description, tasks, cascadeUpdate } = req.body;
         
         // Validation
         if (!name || !name.trim()) {
-          return res.status(400).json({ 
+          res.status(400).json({ 
             error: 'Name is required' 
           });
+          return;
         }
 
         // Translate room template name to Spanish when name changes
@@ -58,7 +61,7 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           ...result,
           warning: translationWarning
         });
-        break;
+        return;
 
       case 'DELETE':
         const { cascadeDelete } = req.body;
@@ -68,11 +71,12 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           cascadeDelete || false
         );
         res.status(200).json(deleteResult);
-        break;
+        return;
 
       default:
         res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
+        return;
     }
   } catch (error) {
     console.error('Room Template API Error:', error);
@@ -80,6 +84,7 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
+    return;
   }
 });
 

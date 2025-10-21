@@ -3,22 +3,23 @@ import { withAuth } from '@/lib/middleware/auth';
 import { roomTemplateService } from '@/services/roomTemplateService';
 import { translateToSpanish } from '@/lib/serverTranslate';
 
-export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   try {
     switch (req.method) {
       case 'GET':
         const templates = await roomTemplateService.getTemplatesWithUsageCount();
         res.status(200).json(templates);
-        break;
+        return;
 
       case 'POST':
         const { name, description, tasks } = req.body;
         
         // Validation
         if (!name || !name.trim()) {
-          return res.status(400).json({ 
+          res.status(400).json({ 
             error: 'Name is required' 
           });
+          return;
         }
 
         // Translate room template name to Spanish
@@ -44,11 +45,12 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           ...newTemplate,
           warning: translationWarning
         });
-        break;
+        return;
 
       default:
         res.setHeader('Allow', ['GET', 'POST']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
+        return;
     }
   } catch (error) {
     console.error('Room Templates API Error:', error);
@@ -56,6 +58,7 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
+    return;
   }
 });
 

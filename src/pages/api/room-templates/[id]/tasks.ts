@@ -3,12 +3,13 @@ import { withAuth } from '@/lib/middleware/auth';
 import { roomTemplateService } from '@/services/roomTemplateService';
 import { translateToSpanish } from '@/lib/serverTranslate';
 
-export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const { id } = req.query;
   const templateId = parseInt(id as string);
 
   if (isNaN(templateId)) {
-    return res.status(400).json({ error: 'Invalid template ID' });
+    res.status(400).json({ error: 'Invalid template ID' });
+    return;
   }
 
   try {
@@ -18,9 +19,10 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
         
         // Validation
         if (!description || !description.trim()) {
-          return res.status(400).json({ 
+          res.status(400).json({ 
             error: 'Description is required' 
           });
+          return;
         }
 
         // Translate description to Spanish if not already provided
@@ -45,11 +47,12 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           ...template,
           warning: translationWarning
         });
-        break;
+        return;
 
       default:
         res.setHeader('Allow', ['POST']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
+        return;
     }
   } catch (error) {
     console.error('Room Template Tasks API Error:', error);
@@ -57,6 +60,7 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
+    return;
   }
 });
 
