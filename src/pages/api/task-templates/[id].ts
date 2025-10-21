@@ -67,10 +67,11 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
             return;
           }
           
-          templateUpdateData.description = description.trim();
+          const trimmedDescription = description.trim();
+          templateUpdateData.description = trimmedDescription;
           
           // Re-translate to Spanish when description changes
-          const description_es = await translateToSpanish(templateUpdateData.description);
+          const description_es = await translateToSpanish(trimmedDescription);
           templateUpdateData.description_es = description_es;
           translationWarning = description_es === null ? 'Translation to Spanish failed. Template saved in English only.' : null;
         }
