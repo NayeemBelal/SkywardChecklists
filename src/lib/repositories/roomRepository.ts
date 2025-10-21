@@ -71,19 +71,8 @@ export class RoomRepository {
   }
 
   async delete(id: number): Promise<void> {
-    // Check for existing tasks before deletion
-    const { data: tasks, error: tasksError } = await this.client
-      .from('app_tasks')
-      .select('id')
-      .eq('room_id', id)
-      .limit(1);
-    
-    if (tasksError) throw tasksError;
-    
-    if (tasks && tasks.length > 0) {
-      throw new Error('Cannot delete room with existing tasks');
-    }
-    
+    // Delete the room - database will cascade delete tasks and task assignments automatically
+    // Due to foreign key constraint: app_tasks.room_id -> app_rooms.id (ON DELETE CASCADE)
     const { error } = await this.client
       .from('app_rooms')
       .delete()

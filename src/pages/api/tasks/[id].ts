@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { withAuth } from '@/lib/middleware/auth';
 import { TaskRepository } from '@/lib/repositories/taskRepository';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { translateToSpanish } from '@/lib/serverTranslate';
 
 export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
@@ -38,7 +39,8 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
         }
 
         // Prepare update data, preserving existing values for fields not being updated
-        const taskUpdateData: { description?: string; task_description?: string; sort_order?: number } = {};
+        const taskUpdateData: { description?: string; description_es?: string | null; task_description?: string; sort_order?: number } = {};
+        let translationWarning: string | null = null;
         
         if (updateData.description !== undefined) {
           if (!updateData.description || updateData.description.trim().length < 1) {
@@ -47,6 +49,11 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
             });
           }
           taskUpdateData.description = updateData.description.trim();
+          
+          // Re-translate to Spanish when description changes
+          const description_es = await translateToSpanish(taskUpdateData.description);
+          taskUpdateData.description_es = description_es;
+          translationWarning = description_es === null ? 'Translation to Spanish failed. Task saved in English only.' : null;
         }
         
         if (updateData.task_description !== undefined) {
@@ -58,7 +65,10 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
         }
 
         const updatedTask = await taskRepository.update(taskId, taskUpdateData);
-        res.status(200).json(updatedTask);
+        res.status(200).json({
+          task: updatedTask,
+          warning: translationWarning
+        });
         break;
 
       case 'DELETE':

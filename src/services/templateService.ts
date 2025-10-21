@@ -50,17 +50,31 @@ class TemplateService {
   }
 
   async createTemplate(template: TaskTemplateFormData): Promise<TaskTemplate> {
-    return this.request<TaskTemplate>('', {
+    const response = await this.request<{ template: TaskTemplate; warning?: string | null }>('', {
       method: 'POST',
       body: JSON.stringify(template),
     });
+    
+    // Show warning if translation failed
+    if (response.warning) {
+      console.warn('⚠️ Translation warning:', response.warning);
+    }
+    
+    return response.template;
   }
 
   async updateTemplate(id: number, updates: Partial<TaskTemplateFormData>, cascadeUpdate = false): Promise<TaskTemplate & { cascadeInfo?: { tasksAffected: number; cascadeUpdate: boolean } }> {
-    return this.request<TaskTemplate & { cascadeInfo?: { tasksAffected: number; cascadeUpdate: boolean } }>(`/${id}`, {
+    const response = await this.request<{ template: TaskTemplate; cascadeInfo?: { tasksAffected: number; cascadeUpdate: boolean }; warning?: string | null }>(`/${id}`, {
       method: 'PUT',
       body: JSON.stringify({ ...updates, cascadeUpdate }),
     });
+    
+    // Show warning if translation failed
+    if (response.warning) {
+      console.warn('⚠️ Translation warning:', response.warning);
+    }
+    
+    return { ...response.template, cascadeInfo: response.cascadeInfo };
   }
 
   async deleteTemplate(id: number, cascadeDelete = false): Promise<{ message: string; cascadeInfo?: { tasksAffected: number; cascadeDelete: boolean } }> {

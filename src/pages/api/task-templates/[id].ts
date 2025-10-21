@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { withAuth } from '@/lib/middleware/auth';
 import { TaskTemplateRepository } from '@/lib/repositories/taskTemplateRepository';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { translateToSpanish } from '@/lib/serverTranslate';
 
 export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const supabaseAdmin = getSupabaseAdmin();
@@ -36,7 +37,8 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
         const { name, description, cascadeUpdate = false } = req.body;
         
         // Prepare update data
-        const templateUpdateData: { name?: string; description?: string } = {};
+        const templateUpdateData: { name?: string; description?: string; description_es?: string | null } = {};
+        let translationWarning: string | null = null;
         
         if (name !== undefined) {
           if (!name || name.trim().length < 1) {
@@ -66,6 +68,11 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           }
           
           templateUpdateData.description = description.trim();
+          
+          // Re-translate to Spanish when description changes
+          const description_es = await translateToSpanish(templateUpdateData.description);
+          templateUpdateData.description_es = description_es;
+          translationWarning = description_es === null ? 'Translation to Spanish failed. Template saved in English only.' : null;
         }
 
         // Get tasks using this template for cascade update
@@ -80,11 +87,12 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
         const updatedTemplate = await templateRepository.update(templateId, templateUpdateData);
         
         res.status(200).json({
-          ...updatedTemplate,
+          template: updatedTemplate,
           cascadeInfo: {
             tasksAffected: tasksCount,
             cascadeUpdate: cascadeUpdate && tasksCount > 0
-          }
+          },
+          warning: translationWarning
         });
         break;
 

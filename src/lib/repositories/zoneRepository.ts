@@ -70,19 +70,8 @@ export class ZoneRepository {
   }
 
   async delete(id: number): Promise<void> {
-    // Check for existing rooms before deletion
-    const { data: rooms, error: roomsError } = await this.client
-      .from('app_rooms')
-      .select('id')
-      .eq('zone_id', id)
-      .limit(1);
-    
-    if (roomsError) throw roomsError;
-    
-    if (rooms && rooms.length > 0) {
-      throw new Error('Cannot delete zone with existing rooms');
-    }
-    
+    // Delete the zone - database will cascade delete rooms, tasks, and assignments automatically
+    // Cascade chain: zone -> rooms -> tasks -> task_assignments
     const { error } = await this.client
       .from('app_zones')
       .delete()

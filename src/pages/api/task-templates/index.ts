@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { withAuth } from '@/lib/middleware/auth';
 import { TaskTemplateRepository } from '@/lib/repositories/taskTemplateRepository';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { translateToSpanish } from '@/lib/serverTranslate';
 
 export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const supabaseAdmin = getSupabaseAdmin();
@@ -58,11 +59,19 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           return;
         }
 
+        // Translate description to Spanish
+        const description_es = await translateToSpanish(description.trim());
+        const translationWarning = description_es === null ? 'Translation to Spanish failed. Template saved in English only.' : null;
+
         const newTemplate = await templateRepository.create({ 
           name: name.trim(),
-          description: description.trim()
+          description: description.trim(),
+          description_es
         });
-        res.status(201).json(newTemplate);
+        res.status(201).json({
+          template: newTemplate,
+          warning: translationWarning
+        });
         break;
 
       default:

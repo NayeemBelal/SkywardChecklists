@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Site, SiteFormData } from '@/types';
 
 interface SiteFormProps {
@@ -9,6 +12,7 @@ interface SiteFormProps {
 }
 
 export function SiteForm({ site, onSubmit, onCancel, loading }: SiteFormProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     pin: '',
@@ -93,13 +97,13 @@ export function SiteForm({ site, onSubmit, onCancel, loading }: SiteFormProps) {
   return (
     <div className="bg-white p-6 rounded-lg shadow">
       <h2 className="text-xl font-semibold mb-4 text-gray-900">
-        {site ? 'Edit Site' : 'Create New Site'}
+        {site ? t('edit_site') : t('create_site')}
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Site Name
+            {t('site_name')}
           </label>
           <input
             type="text"
@@ -110,7 +114,7 @@ export function SiteForm({ site, onSubmit, onCancel, loading }: SiteFormProps) {
             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500 ${
               errors.name ? 'border-red-500' : 'border-gray-300'
             }`}
-            placeholder="Enter site name"
+            placeholder={t('site_name')}
             disabled={loading}
           />
           {errors.name && (
@@ -132,7 +136,7 @@ export function SiteForm({ site, onSubmit, onCancel, loading }: SiteFormProps) {
               className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500 ${
                 errors.pin ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="Enter 6-digit PIN"
+              placeholder="6-digit PIN"
               maxLength={6}
               disabled={loading}
             />
@@ -157,14 +161,14 @@ export function SiteForm({ site, onSubmit, onCancel, loading }: SiteFormProps) {
             className="px-4 py-2 text-sm font-medium text-gray-900 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
             disabled={loading}
           >
-            Cancel
+            {t('cancel')}
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             disabled={loading}
           >
-            {loading ? 'Saving...' : (site ? 'Update Site' : 'Create Site')}
+            {loading ? t('loading') : (site ? t('edit_site') : t('create_site'))}
           </button>
         </div>
       </form>

@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Site } from '@/types';
 
 interface SiteListProps {
@@ -9,11 +12,13 @@ interface SiteListProps {
 }
 
 export function SiteList({ sites, onEdit, onDelete, loading }: SiteListProps) {
+  const { t } = useTranslation();
+  
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-gray-600">Loading sites...</span>
+        <span className="ml-2 text-gray-600">{t('loading')}</span>
       </div>
     );
   }
@@ -21,7 +26,7 @@ export function SiteList({ sites, onEdit, onDelete, loading }: SiteListProps) {
   if (sites.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
-        No sites found. Create your first site to get started.
+        {t('no_sites')}. {t('create_site')} to get started.
       </div>
     );
   }
@@ -35,10 +40,10 @@ export function SiteList({ sites, onEdit, onDelete, loading }: SiteListProps) {
               ID
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Name
+              {t('name')}
             </th>
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
+              {t('actions')}
             </th>
           </tr>
         </thead>
@@ -56,13 +61,13 @@ export function SiteList({ sites, onEdit, onDelete, loading }: SiteListProps) {
                   onClick={() => onEdit(site)}
                   className="text-blue-600 hover:text-blue-900 mr-3"
                 >
-                  Edit
+                  {t('edit')}
                 </button>
                 <button
                   onClick={() => onDelete(site)}
                   className="text-red-600 hover:text-red-900"
                 >
-                  Delete
+                  {t('delete')}
                 </button>
               </td>
             </tr>

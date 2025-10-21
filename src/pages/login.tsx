@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
+import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,12 +43,13 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <LanguageSwitcher />
           <button
             onClick={() => router.push('/')}
             className="h-10 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Back to Employee View
+            {t('back')} to {t('employee')} View
           </button>
         </div>
       </div>
@@ -54,7 +58,7 @@ export default function LoginPage() {
         <div className="max-w-md mx-auto w-full space-y-8">
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Admin Login
+              {t('admin')} {t('login')}
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
               Sign in to access the admin panel
@@ -64,7 +68,7 @@ export default function LoginPage() {
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
                 <label htmlFor="email" className="sr-only">
-                  Email address
+                  Email
                 </label>
                 <input
                   id="email"
@@ -73,7 +77,7 @@ export default function LoginPage() {
                   autoComplete="email"
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Email address"
+                  placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
@@ -110,7 +114,7 @@ export default function LoginPage() {
                 disabled={loading}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
               >
-                {loading ? 'Signing in...' : 'Sign in'}
+                {loading ? t('loading') : t('login')}
               </button>
             </div>
           </form>

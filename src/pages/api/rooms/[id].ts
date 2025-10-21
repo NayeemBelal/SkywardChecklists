@@ -64,17 +64,9 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           return res.status(404).json({ error: 'Room not found' });
         }
 
-        try {
-          await roomRepository.delete(roomId);
-          res.status(204).end();
-        } catch (deleteError) {
-          if (deleteError instanceof Error && deleteError.message.includes('existing tasks')) {
-            return res.status(400).json({ 
-              error: 'Cannot delete room with existing tasks' 
-            });
-          }
-          throw deleteError;
-        }
+        // Delete room - database CASCADE will automatically delete all tasks and task assignments
+        await roomRepository.delete(roomId);
+        res.status(204).end();
         break;
 
       default:

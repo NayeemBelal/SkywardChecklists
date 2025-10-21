@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'react-i18next';
 import { Site, SiteFormData, Zone, Employee, EmployeeAssignmentHierarchy } from '@/types';
 import { useSites } from '@/hooks/useSites';
 import { useZones } from '@/hooks/useZones';
@@ -10,9 +11,11 @@ import { SiteDeleteModal } from '@/components/admin/SiteDeleteModal';
 import { EmployeeTab } from '@/components/admin/EmployeeTab';
 import { EmployeeSearchBar } from '@/components/admin/EmployeeSearchBar';
 import { EmployeeAssignmentDetailsModal } from '@/components/admin/EmployeeAssignmentDetailsModal';
+import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 
 export default function SitesPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { sites, loading, error, createSite, deleteSite } = useSites();
   const [showForm, setShowForm] = useState(false);
   const [deletingSite, setDeletingSite] = useState<Site | null>(null);
@@ -52,9 +55,9 @@ export default function SitesPage() {
       setFormLoading(true);
       await createSite(siteData);
       setShowForm(false);
-      setMessage({ type: 'success', text: 'Site created successfully!' });
+      setMessage({ type: 'success', text: t('site_created') });
     } catch (error) {
-      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Failed to create site' });
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : t('operation_failed') });
     } finally {
       setFormLoading(false);
     }
@@ -68,9 +71,9 @@ export default function SitesPage() {
       setFormLoading(true);
       await deleteSite(deletingSite.id);
       setDeletingSite(null);
-      setMessage({ type: 'success', text: 'Site deleted successfully!' });
+      setMessage({ type: 'success', text: t('site_deleted') });
     } catch (error) {
-      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Failed to delete site' });
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : t('operation_failed') });
     } finally {
       setFormLoading(false);
     }
@@ -157,7 +160,7 @@ export default function SitesPage() {
       setSelectedEmployeeHierarchy(hierarchy);
       setIsDetailsModalOpen(true);
     } catch {
-      setMessage({ type: 'error', text: 'Failed to load employee details' });
+      setMessage({ type: 'error', text: t('operation_failed') });
     }
   };
 
@@ -210,28 +213,29 @@ export default function SitesPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-between items-center mb-4">
+            <LanguageSwitcher />
             <button
               onClick={() => router.push('/')}
               className="h-10 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              Go to Employee View
+              {t('employee')} View
             </button>
           </div>
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{t('dashboard')}</h1>
             <p className="mt-2 text-gray-600">Manage client locations and their associated data.</p>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="mb-6 p-4 bg-red-50 text-red-800 border border-red-200 rounded-md">
-              <p className="text-sm font-medium">Log in to see admin dashboard.</p>
+              <p className="text-sm font-medium">{t('login')} to see admin dashboard.</p>
             </div>
             <div className="flex justify-center">
               <button
                 onClick={() => router.push('/login')}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Login
+                {t('login')}
               </button>
             </div>
           </div>
@@ -243,16 +247,17 @@ export default function SitesPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-between items-center mb-4">
+          <LanguageSwitcher />
           <button
             onClick={() => router.push('/')}
             className="h-10 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Go to Employee View
+            {t('employee')} View
           </button>
         </div>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Site Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t('sites')} Management</h1>
           <p className="mt-2 text-gray-600">
             Manage client locations and their associated data.
           </p>
@@ -270,7 +275,7 @@ export default function SitesPage() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Sites
+                {t('sites')}
               </button>
               <button
                 onClick={() => setActiveTab('employees')}
@@ -280,7 +285,7 @@ export default function SitesPage() {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Employee Assignments
+                {t('employee')} {t('assign_employees')}
               </button>
             </nav>
           </div>
@@ -315,7 +320,7 @@ export default function SitesPage() {
         {/* Error Display */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 text-red-800 border border-red-200 rounded-md">
-            <p className="text-sm font-medium">Error: {error}</p>
+            <p className="text-sm font-medium">{t('error')}: {error}</p>
           </div>
         )}
 
@@ -327,7 +332,7 @@ export default function SitesPage() {
                 onClick={() => setShowForm(true)}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Create New Site
+                {t('create_site')}
               </button>
             </div>
             <div>
@@ -338,7 +343,7 @@ export default function SitesPage() {
                 }}
                 className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
-                Logout
+                {t('logout')}
               </button>
             </div>
           </div>
@@ -349,15 +354,15 @@ export default function SitesPage() {
           <>
             {/* Search bar for viewing employee details */}
             <div className="mb-6 bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Search Employees</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">{t('search_employees')}</h3>
               <EmployeeSearchBar
                 employees={topSearchResults}
                 onSearch={handleTopSearch}
                 onSelectEmployee={handleTopViewDetails}
-                placeholder="Search employees by name..."
+                placeholder={t('search_employees') + '...'}
               />
               {topSearchLoading && (
-                <div className="mt-2 text-sm text-gray-500">Searching...</div>
+                <div className="mt-2 text-sm text-gray-500">{t('loading')}</div>
               )}
             </div>
 
@@ -366,7 +371,7 @@ export default function SitesPage() {
               {!showZoneSelector ? (
                 /* Site Selector */
                 <>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Select Site for Employee Assignments</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">{t('select_site')} for {t('assign_employees')}</h3>
                   {sites.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {sites.map((site) => (
@@ -376,12 +381,12 @@ export default function SitesPage() {
                           className="p-4 border border-gray-300 rounded-lg text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <h4 className="font-medium text-gray-900">{site.name}</h4>
-                          <p className="text-sm text-gray-600 mt-1">Site ID: {site.id}</p>
+                          <p className="text-sm text-gray-600 mt-1">{t('site')} ID: {site.id}</p>
                         </button>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500">No sites available. Create a site first to manage employee assignments.</p>
+                    <p className="text-gray-500">{t('no_sites')}. {t('create_site')} first to manage employee assignments.</p>
                   )}
                 </>
               ) : (
@@ -389,17 +394,17 @@ export default function SitesPage() {
                 <>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-medium text-gray-900">
-                      Select Zone in {selectedSite?.name}
+                      {t('select_zone')} in {selectedSite?.name}
                     </h3>
                     <button
                       onClick={handleBackToSites}
                       className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:underline"
                     >
-                      ← Back to Sites
+                      ← {t('back')} to {t('sites')}
                     </button>
                   </div>
                   {zonesLoading ? (
-                    <p className="text-gray-500">Loading zones...</p>
+                    <p className="text-gray-500">{t('loading')}</p>
                   ) : siteZones.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {siteZones.map((zone) => (
@@ -414,13 +419,13 @@ export default function SitesPage() {
                         >
                           <h4 className="font-medium text-gray-900">{zone.name}</h4>
                           <p className="text-sm text-gray-600 mt-1">
-                            {zone.description || 'No description'}
+                            {zone.description || t('no_data_available')}
                           </p>
                         </button>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500">No zones available for this site. Create zones first to manage employee assignments.</p>
+                    <p className="text-gray-500">{t('no_zones')} for this site. {t('create_zone')} first to manage employee assignments.</p>
                   )}
                 </>
               )}
@@ -462,17 +467,17 @@ export default function SitesPage() {
                 onAssignEmployee={async (employeeId: number) => {
                   try {
                     await assignEmployeeToZone(employeeId, selectedZone.id);
-                    setMessage({ type: 'success', text: 'Employee assigned to zone successfully!' });
+                    setMessage({ type: 'success', text: t('employee_assigned') });
                   } catch {
-                    setMessage({ type: 'error', text: 'Failed to assign employee to zone' });
+                    setMessage({ type: 'error', text: t('operation_failed') });
                   }
                 }}
                 onRemoveEmployee={async (employeeId: number) => {
                   try {
                     await removeEmployeeFromZone(employeeId, selectedZone.id);
-                    setMessage({ type: 'success', text: 'Employee removed from zone successfully!' });
+                    setMessage({ type: 'success', text: t('employee_unassigned') });
                   } catch {
-                    setMessage({ type: 'error', text: 'Failed to remove employee from zone' });
+                    setMessage({ type: 'error', text: t('operation_failed') });
                   }
                 }}
                 onGetAllEmployeesWithAssignmentStatus={handleGetAllEmployeesWithAssignmentStatus}
@@ -483,10 +488,10 @@ export default function SitesPage() {
               <div className="bg-white rounded-lg shadow p-6">
                 <p className="text-gray-500 text-center">
                   {!selectedSite 
-                    ? "Please select a site above to manage employee assignments."
+                    ? t('select_site') + " above to manage employee assignments."
                     : !selectedZone 
-                    ? "Please select a zone above to manage employee assignments."
-                    : "Loading..."
+                    ? t('select_zone') + " above to manage employee assignments."
+                    : t('loading')
                   }
                 </p>
               </div>

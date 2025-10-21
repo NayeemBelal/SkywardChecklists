@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Employee } from '@/types';
 
 interface Props {
@@ -9,6 +12,8 @@ interface Props {
 }
 
 export function EmployeeSelector({ employees, selectedEmployee, onChange, disabled }: Props) {
+  const { t } = useTranslation();
+  
   return (
     <select
       className="w-full h-11 border border-gray-300 rounded-md px-3 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
@@ -16,7 +21,7 @@ export function EmployeeSelector({ employees, selectedEmployee, onChange, disabl
       onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
       disabled={disabled}
     >
-      <option value="">Select an employee</option>
+      <option value="">{t('select_employee')}</option>
       {employees.map((e) => (
         <option key={e.id} value={e.id}>{e.full_name}</option>
       ))}

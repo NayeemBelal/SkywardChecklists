@@ -246,11 +246,12 @@ export default function TemplateModal({ isOpen, onClose, onSelectTemplate, roomI
 
   const handleSelectTemplate = async (template: TaskTemplate) => {
     try {
-      // Create task from template
+      // Create task from template - pass template's Spanish translation to avoid re-translating
       const { taskService } = await import('@/services/taskService');
       await taskService.createTask({
         room_id: roomId,
         description: template.name,
+        description_es: template.description_es, // Use template's existing Spanish translation
         task_description: template.description,
         template_id: template.id,
       });

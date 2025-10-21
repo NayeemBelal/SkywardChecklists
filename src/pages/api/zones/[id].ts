@@ -64,17 +64,9 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           return res.status(404).json({ error: 'Zone not found' });
         }
 
-        try {
-          await zoneRepository.delete(zoneId);
-          res.status(204).end();
-        } catch (deleteError) {
-          if (deleteError instanceof Error && deleteError.message.includes('existing rooms')) {
-            return res.status(400).json({ 
-              error: 'Cannot delete zone with existing rooms' 
-            });
-          }
-          throw deleteError;
-        }
+        // Delete zone - database CASCADE will automatically delete all rooms, tasks, and assignments
+        await zoneRepository.delete(zoneId);
+        res.status(204).end();
         break;
 
       default:

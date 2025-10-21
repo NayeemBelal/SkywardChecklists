@@ -45,17 +45,31 @@ class TaskService {
   }
 
   async createTask(task: TaskFormData): Promise<Task> {
-    return this.request<Task>('', {
+    const response = await this.request<{ task: Task; warning?: string | null }>('', {
       method: 'POST',
       body: JSON.stringify(task),
     });
+    
+    // Show warning if translation failed
+    if (response.warning) {
+      console.warn('⚠️ Translation warning:', response.warning);
+    }
+    
+    return response.task;
   }
 
   async updateTask(id: number, updates: Partial<TaskFormData>): Promise<Task> {
-    return this.request<Task>(`/${id}`, {
+    const response = await this.request<{ task: Task; warning?: string | null }>(`/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
+    
+    // Show warning if translation failed
+    if (response.warning) {
+      console.warn('⚠️ Translation warning:', response.warning);
+    }
+    
+    return response.task;
   }
 
   async deleteTask(id: number): Promise<void> {

@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Site } from '@/types';
 
 interface SiteDeleteModalProps {
@@ -9,6 +12,7 @@ interface SiteDeleteModalProps {
 }
 
 export function SiteDeleteModal({ site, onConfirm, onCancel, loading }: SiteDeleteModalProps) {
+  const { t } = useTranslation();
   if (!site) return null;
 
   return (
@@ -31,12 +35,12 @@ export function SiteDeleteModal({ site, onConfirm, onCancel, loading }: SiteDele
             </svg>
           </div>
           <h3 className="text-lg font-medium text-gray-900 mt-4">
-            Delete Site
+            {t('delete_site')}
           </h3>
           <div className="mt-2 px-7 py-3">
             <p className="text-sm text-gray-500">
-              Are you sure you want to delete the site <strong>&ldquo;{site.name}&rdquo;</strong>? 
-              This action cannot be undone.
+              {t('confirm_delete_site')} <strong>&ldquo;{site.name}&rdquo;</strong>? 
+              {' '}{t('this_action_cannot_be_undone')}
             </p>
           </div>
           <div className="flex justify-center space-x-3 px-4 py-3">
@@ -45,14 +49,14 @@ export function SiteDeleteModal({ site, onConfirm, onCancel, loading }: SiteDele
               className="px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
               disabled={loading}
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               onClick={onConfirm}
               className="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
               disabled={loading}
             >
-              {loading ? 'Deleting...' : 'Delete'}
+              {loading ? t('loading') : t('delete')}
             </button>
           </div>
         </div>

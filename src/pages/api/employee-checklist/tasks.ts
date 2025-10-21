@@ -79,7 +79,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // 6) Fetch tasks for allowed rooms
     const { data: taskRows, error: taskErr } = await supabase
       .from('app_tasks')
-      .select('id, description, room_id')
+      .select('id, description, description_es, room_id')
       .in('room_id', allowedRoomIds)
       .order('id');
     if (taskErr) return res.status(500).json({ error: 'Failed to fetch tasks' });
@@ -88,12 +88,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const zoneIdToZone = new Map<number, { id: number; name: string }>();
     for (const z of siteZones || []) zoneIdToZone.set(z.id, { id: z.id, name: z.name });
 
-    const response = (taskRows || []).map((t: { id: number; description: string; room_id: number }) => {
+    const response = (taskRows || []).map((t: { id: number; description: string; description_es: string | null; room_id: number }) => {
       const room = roomIdToRoom[t.room_id];
       const zone = room ? zoneIdToZone.get(room.zone_id) || null : null;
       return {
         id: t.id,
         description: t.description,
+        description_es: t.description_es,
         room: room ? { id: room.id, name: room.name } : null,
         zone
       };

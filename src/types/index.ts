@@ -42,6 +42,7 @@ export interface Task {
   id: number;
   room_id: number;
   description: string;
+  description_es?: string | null;
   task_description?: string;
   sort_order: number;
   template_id?: number;
@@ -53,6 +54,7 @@ export interface Task {
 export interface TaskFormData {
   room_id: number;
   description: string;
+  description_es?: string | null;
   task_description?: string;
   sort_order?: number;
   template_id?: number;
@@ -63,6 +65,7 @@ export interface TaskTemplate {
   id: number;
   name: string;
   description: string;
+  description_es?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -71,6 +74,7 @@ export interface TaskTemplate {
 export interface TaskTemplateFormData {
   name: string;
   description: string;
+  description_es?: string | null;
 }
 
 // Task Assignment types

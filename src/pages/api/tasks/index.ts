@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { withAuth } from '@/lib/middleware/auth';
 import { TaskRepository } from '@/lib/repositories/taskRepository';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { translateToSpanish } from '@/lib/serverTranslate';
 
 export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabaseAdmin = getSupabaseAdmin();
@@ -15,7 +16,7 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
         break;
 
       case 'POST':
-        const { room_id, description, task_description, sort_order } = req.body;
+        const { room_id, description, description_es: provided_description_es, task_description, sort_order } = req.body;
         
         // Validation
         if (!room_id || !description) {
@@ -43,13 +44,27 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
           finalSortOrder = existingTasks.length;
         }
 
+        // Translate description to Spanish if not already provided (e.g., from template)
+        let description_es = provided_description_es;
+        let translationWarning: string | null = null;
+        
+        if (!description_es) {
+          description_es = await translateToSpanish(description.trim());
+          translationWarning = description_es === null ? 'Translation to Spanish failed. Task saved in English only.' : null;
+        }
+
         const newTask = await taskRepository.create({ 
           room_id, 
           description: description.trim(),
+          description_es,
           task_description: task_description?.trim() || null,
           sort_order: finalSortOrder
         });
-        res.status(201).json(newTask);
+        
+        res.status(201).json({ 
+          task: newTask,
+          warning: translationWarning 
+        });
         break;
 
       default:
