@@ -156,8 +156,6 @@ const resources = {
       password: 'Password',
       email: 'Email',
       sign_in: 'Sign in',
-      task_description: 'Task Description',
-      no_tasks: 'No tasks',
     }
   },
   es: {
@@ -314,8 +312,6 @@ const resources = {
       password: 'Contraseña',
       email: 'Correo Electrónico',
       sign_in: 'Iniciar sesión',
-      task_description: 'Descripción de la Tarea',
-      no_tasks: 'No hay tareas',
     }
   }
 };
