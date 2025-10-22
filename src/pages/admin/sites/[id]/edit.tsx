@@ -6,6 +6,7 @@ import { useZones } from '@/hooks/useZones';
 import { ZoneList } from '@/components/admin/ZoneList';
 import { ZoneForm } from '@/components/admin/ZoneForm';
 import { ZoneDeleteModal } from '@/components/admin/ZoneDeleteModal';
+import { FloorplanPanel } from '@/components/admin/FloorplanPanel';
 import { ZoneFormData } from '@/services/zoneService';
 
 export default function EditSitePage() {
@@ -20,6 +21,7 @@ export default function EditSitePage() {
   const [deletingZone, setDeletingZone] = useState<Zone | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showFloorplanPanel, setShowFloorplanPanel] = useState(false);
 
   // Check authentication on page load
   useEffect(() => {
@@ -190,12 +192,18 @@ export default function EditSitePage() {
         )}
 
         {/* Action Buttons */}
-        <div className="mb-6">
+        <div className="mb-6 flex space-x-3">
           <button
             onClick={() => setShowZoneForm(true)}
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Create New Zone
+          </button>
+          <button
+            onClick={() => setShowFloorplanPanel(true)}
+            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            Manage Floorplans
           </button>
         </div>
 
@@ -242,6 +250,14 @@ export default function EditSitePage() {
           loading={formLoading}
         />
       </div>
+
+      {/* Floorplan Panel */}
+      <FloorplanPanel
+        entityId={site.id}
+        entityType="site"
+        isOpen={showFloorplanPanel}
+        onClose={() => setShowFloorplanPanel(false)}
+      />
     </div>
   );
 }

@@ -44,13 +44,13 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
         <div className="flex justify-between items-center">
-          <LanguageSwitcher />
           <button
             onClick={() => router.push('/')}
             className="h-10 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {t('back')} to {t('employee')} View
           </button>
+          <LanguageSwitcher />
         </div>
       </div>
 

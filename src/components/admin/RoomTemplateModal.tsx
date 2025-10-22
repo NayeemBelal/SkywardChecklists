@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RoomTemplateTaskFormData, RoomTemplateWithTasks } from '@/types';
+import { RoomTemplateTaskFormData, RoomTemplateWithTasks, TaskFrequency } from '@/types';
 
 interface RoomTemplateModalProps {
   isOpen: boolean;
@@ -14,7 +14,7 @@ export function RoomTemplateModal({ isOpen, onClose, onSave, template, loading }
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [tasks, setTasks] = useState<Array<{ description: string; task_description: string; tempId: string }>>([]);
+  const [tasks, setTasks] = useState<Array<{ description: string; task_description: string; frequency: TaskFrequency | null; tempId: string }>>([]);
   const [errors, setErrors] = useState<{ name?: string; tasks?: { [key: string]: string } }>({});
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [cascadeUpdate, setCascadeUpdate] = useState(false);
@@ -27,6 +27,7 @@ export function RoomTemplateModal({ isOpen, onClose, onSave, template, loading }
         setTasks(template.tasks.map((t) => ({
           description: t.description,
           task_description: t.task_description || '',
+          frequency: t.frequency || null,
           tempId: `existing-${t.id}`
         })));
       } else {
@@ -42,7 +43,7 @@ export function RoomTemplateModal({ isOpen, onClose, onSave, template, loading }
 
   const handleAddTask = () => {
     const tempId = `temp-${Date.now()}`;
-    setTasks([...tasks, { description: '', task_description: '', tempId }]);
+    setTasks([...tasks, { description: '', task_description: '', frequency: null, tempId }]);
     setEditingTaskId(tempId);
   };
 
@@ -53,8 +54,8 @@ export function RoomTemplateModal({ isOpen, onClose, onSave, template, loading }
     }
   };
 
-  const handleTaskChange = (tempId: string, field: 'description' | 'task_description', value: string) => {
-    setTasks(tasks.map(t => t.tempId === tempId ? { ...t, [field]: value } : t));
+  const handleTaskChange = (tempId: string, field: 'description' | 'task_description' | 'frequency', value: string | TaskFrequency | null) => {
+    setTasks(tasks.map(t => t.tempId === tempId ? { ...t, [field]: value === '' ? null : value } : t));
     // Clear error for this task
     if (errors.tasks?.[tempId]) {
       setErrors({
@@ -112,7 +113,8 @@ export function RoomTemplateModal({ isOpen, onClose, onSave, template, loading }
     const taskData: RoomTemplateTaskFormData[] = tasks.map((task, index) => ({
       description: task.description.trim(),
       task_description: task.task_description.trim() || undefined,
-      sort_order: index
+      sort_order: index,
+      frequency: task.frequency
     }));
 
     await onSave(name.trim(), description.trim(), taskData, cascadeUpdate);
@@ -278,6 +280,23 @@ export function RoomTemplateModal({ isOpen, onClose, onSave, template, loading }
                             placeholder="Enter detailed task description (optional)"
                             disabled={loading}
                           />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Frequency
+                          </label>
+                          <select
+                            value={task.frequency || ''}
+                            onChange={(e) => handleTaskChange(task.tempId, 'frequency', e.target.value as TaskFrequency || null)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                            disabled={loading}
+                          >
+                            <option value="">No frequency</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                          </select>
                         </div>
                       </div>
 

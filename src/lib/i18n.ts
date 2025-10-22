@@ -88,6 +88,12 @@ const resources = {
       no_tasks: 'No tasks available',
       add_task: 'Add Task',
       reorder_tasks: 'Reorder Tasks',
+      task_frequency: 'Task Frequency',
+      frequency: 'Frequency',
+      no_frequency: 'No frequency',
+      daily: 'Daily',
+      weekly: 'Weekly',
+      monthly: 'Monthly',
       
       // Admin - Employees
       employees: 'Employees',
@@ -150,6 +156,10 @@ const resources = {
       task_incomplete: 'Incomplete',
       submit_checklist: 'Submit Checklist',
       checklist_submitted: 'Checklist submitted successfully!',
+      site_floorplan: 'Site Floor Plan',
+      zone_floorplan: 'Zone Floor Plan',
+      click_to_enlarge: 'Click to enlarge',
+      press_esc_or_click_outside: 'Press ESC or click outside to close',
       
       // Forms
       name: 'Name',
@@ -270,6 +280,12 @@ const resources = {
       no_tasks: 'No hay tareas disponibles',
       add_task: 'Agregar Tarea',
       reorder_tasks: 'Reordenar Tareas',
+      task_frequency: 'Frecuencia de Tarea',
+      frequency: 'Frecuencia',
+      no_frequency: 'Sin frecuencia',
+      daily: 'Diario',
+      weekly: 'Semanal',
+      monthly: 'Mensual',
       
       // Admin - Employees
       employees: 'Empleados',
@@ -306,6 +322,10 @@ const resources = {
       task_incomplete: 'Incompleta',
       submit_checklist: 'Enviar Lista de Verificación',
       checklist_submitted: '¡Lista de verificación enviada exitosamente!',
+      site_floorplan: 'Plano del Sitio',
+      zone_floorplan: 'Plano de la Zona',
+      click_to_enlarge: 'Haga clic para ampliar',
+      press_esc_or_click_outside: 'Presione ESC o haga clic fuera para cerrar',
       
       // Forms
       name: 'Nombre',

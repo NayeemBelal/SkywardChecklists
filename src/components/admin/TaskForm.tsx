@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Task, TaskFormData } from '@/types';
+import { Task, TaskFormData, TaskFrequency } from '@/types';
 
 interface TaskFormProps {
   task?: Task | null;
@@ -10,9 +10,14 @@ interface TaskFormProps {
 }
 
 export function TaskForm({ task, roomId, onSubmit, onCancel, loading }: TaskFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    description: string;
+    task_description: string;
+    frequency: TaskFrequency | null;
+  }>({
     description: '',
     task_description: '',
+    frequency: null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -21,11 +26,13 @@ export function TaskForm({ task, roomId, onSubmit, onCancel, loading }: TaskForm
       setFormData({
         description: task.description,
         task_description: task.task_description || '',
+        frequency: task.frequency || null,
       });
     } else {
       setFormData({
         description: '',
         task_description: '',
+        frequency: null,
       });
     }
     setErrors({});
@@ -56,20 +63,21 @@ export function TaskForm({ task, roomId, onSubmit, onCancel, loading }: TaskForm
         room_id: roomId,
         description: formData.description.trim(),
         task_description: formData.task_description.trim() || undefined,
+        frequency: formData.frequency,
       });
     } catch {
       // Error handling is done in the parent component
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
+
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: value === '' ? null : value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -121,6 +129,25 @@ export function TaskForm({ task, roomId, onSubmit, onCancel, loading }: TaskForm
             placeholder="Enter detailed task description"
             disabled={loading}
           />
+        </div>
+
+        <div>
+          <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-1">
+            Frequency (Optional)
+          </label>
+          <select
+            id="frequency"
+            name="frequency"
+            value={formData.frequency || ''}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+            disabled={loading}
+          >
+            <option value="">No frequency</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">

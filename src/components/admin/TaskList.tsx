@@ -218,6 +218,15 @@ function SortableTaskItem({
           ) : (
             <div className="flex items-center space-x-2">
               <p className="text-gray-900 font-medium">{task.description}</p>
+              {task.frequency && (
+                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                  task.frequency === 'daily' ? 'bg-blue-100 text-blue-800' :
+                  task.frequency === 'weekly' ? 'bg-green-100 text-green-800' :
+                  task.frequency === 'monthly' ? 'bg-purple-100 text-purple-800' : ''
+                }`}>
+                  {task.frequency.charAt(0).toUpperCase() + task.frequency.slice(1)}
+                </span>
+              )}
               <button
                 onClick={() => onStartEditField && onStartEditField(task, 'description')}
                 className="text-gray-400 hover:text-gray-600"

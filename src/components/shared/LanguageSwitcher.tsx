@@ -25,9 +25,9 @@ export function LanguageSwitcher() {
   if (!mounted) {
     return (
       <div className="relative inline-block">
-        <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-900">
+        <button className="flex items-center gap-2 px-2 sm:px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-900">
           <span className="text-lg">🇺🇸</span>
-          <span className="font-medium">English</span>
+          <span className="font-medium hidden sm:inline">English</span>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
@@ -38,12 +38,12 @@ export function LanguageSwitcher() {
 
   return (
     <div className="relative inline-block">
-      <button 
+      <button
         onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-        className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-900"
+        className="flex items-center gap-2 px-2 sm:px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-900"
       >
         <span className="text-lg">{getCurrentLanguageFlag()}</span>
-        <span className="font-medium">{getCurrentLanguageName()}</span>
+        <span className="font-medium hidden sm:inline">{getCurrentLanguageName()}</span>
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>

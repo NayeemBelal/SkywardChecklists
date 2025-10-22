@@ -14,6 +14,7 @@ import { TaskForm } from '@/components/admin/TaskForm';
 import { TaskDeleteModal } from '@/components/admin/TaskDeleteModal';
 import TemplateModal from '@/components/admin/TemplateModal';
 import { RoomTemplateSelector } from '@/components/admin/RoomTemplateSelector';
+import { FloorplanPanel } from '@/components/admin/FloorplanPanel';
 import { RoomFormData } from '@/services/roomService';
 import { TaskFormData } from '@/types';
 import { useTranslation } from 'react-i18next';
@@ -48,6 +49,7 @@ export default function EditZonePage() {
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'rooms'>('rooms');
   const [showRoomTemplateSelector, setShowRoomTemplateSelector] = useState(false);
+  const [showFloorplanPanel, setShowFloorplanPanel] = useState(false);
 
   // Check authentication on page load
   useEffect(() => {
@@ -413,6 +415,12 @@ export default function EditZonePage() {
             >
               {t('add_template_room')}
             </button>
+            <button
+              onClick={() => setShowFloorplanPanel(true)}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              Manage Floorplans
+            </button>
           </div>
         )}
 
@@ -567,6 +575,16 @@ export default function EditZonePage() {
           />
         )}
       </div>
+
+      {/* Floorplan Panel */}
+      {zone && (
+        <FloorplanPanel
+          entityId={zone.id}
+          entityType="zone"
+          isOpen={showFloorplanPanel}
+          onClose={() => setShowFloorplanPanel(false)}
+        />
+      )}
     </div>
   );
 }

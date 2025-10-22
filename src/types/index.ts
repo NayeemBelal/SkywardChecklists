@@ -38,6 +38,9 @@ export interface Room {
   updated_at: string;
 }
 
+// Task frequency type
+export type TaskFrequency = 'daily' | 'weekly' | 'monthly';
+
 // Task types
 export interface Task {
   id: number;
@@ -45,7 +48,9 @@ export interface Task {
   description: string;
   description_es?: string | null;
   task_description?: string;
+  task_description_es?: string | null;
   sort_order: number;
+  frequency?: TaskFrequency | null;
   template_id?: number;
   room_template_id?: number | null;
   is_template_task?: boolean;
@@ -60,6 +65,7 @@ export interface TaskFormData {
   description_es?: string | null;
   task_description?: string;
   sort_order?: number;
+  frequency?: TaskFrequency | null;
   template_id?: number;
 }
 
@@ -102,6 +108,7 @@ export interface RoomTemplateTask {
   description_es?: string | null;
   task_description?: string;
   sort_order: number;
+  frequency?: TaskFrequency | null;
   room_id?: number | null; // Can be null for template tasks
   is_template_task?: boolean;
   created_at: string;
@@ -120,6 +127,7 @@ export interface RoomTemplateTaskFormData {
   description_es?: string | null;
   task_description?: string;
   sort_order?: number;
+  frequency?: TaskFrequency | null;
 }
 
 // Task Assignment types
@@ -178,5 +186,35 @@ export interface EmployeeChecklist {
       tasks: Task[];
     }[];
   }[];
+}
+
+// Site Floorplan types
+export interface SiteFloorplan {
+  id: number;
+  site_id: number;
+  image_path: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Site Floorplan creation types (for forms)
+export interface SiteFloorplanFormData {
+  site_id: number;
+  file: File;
+}
+
+// Zone Floorplan types
+export interface ZoneFloorplan {
+  id: number;
+  zone_id: number;
+  image_path: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Zone Floorplan creation types (for forms)
+export interface ZoneFloorplanFormData {
+  zone_id: number;
+  file: File;
 }
 

@@ -3,6 +3,7 @@ import { withAuth } from '@/lib/middleware/auth';
 import { TaskRepository } from '@/lib/repositories/taskRepository';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { translateToSpanish } from '@/lib/serverTranslate';
+import { TaskFrequency } from '@/types';
 
 export default withAuth(async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
@@ -31,7 +32,7 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
 
       case 'PUT':
         const updateData = req.body;
-        
+
         // Check if task exists
         const existingTask = await taskRepository.findById(taskId);
         if (!existingTask) {
@@ -39,30 +40,52 @@ export default withAuth(async function handler(req: NextApiRequest, res: NextApi
         }
 
         // Prepare update data, preserving existing values for fields not being updated
-        const taskUpdateData: { description?: string; description_es?: string | null; task_description?: string; sort_order?: number } = {};
+        const taskUpdateData: { description?: string; description_es?: string | null; task_description?: string; task_description_es?: string | null; sort_order?: number; frequency?: TaskFrequency | null } = {};
         let translationWarning: string | null = null;
-        
+
         if (updateData.description !== undefined) {
           if (!updateData.description || updateData.description.trim().length < 1) {
-            return res.status(400).json({ 
-              error: 'Description is required and must be at least 1 character' 
+            return res.status(400).json({
+              error: 'Description is required and must be at least 1 character'
             });
           }
           const trimmedDescription = updateData.description.trim();
           taskUpdateData.description = trimmedDescription;
-          
+
           // Re-translate to Spanish when description changes
           const description_es = await translateToSpanish(trimmedDescription);
           taskUpdateData.description_es = description_es;
           translationWarning = description_es === null ? 'Translation to Spanish failed. Task saved in English only.' : null;
         }
-        
+
         if (updateData.task_description !== undefined) {
           taskUpdateData.task_description = updateData.task_description?.trim() || undefined;
+
+          // Re-translate task_description to Spanish when it changes
+          if (updateData.task_description?.trim()) {
+            const task_description_es = await translateToSpanish(updateData.task_description.trim());
+            taskUpdateData.task_description_es = task_description_es;
+            if (task_description_es === null && !translationWarning) {
+              translationWarning = 'Translation to Spanish failed. Task saved in English only.';
+            }
+          } else {
+            // If task_description is cleared, also clear the Spanish version
+            taskUpdateData.task_description_es = null;
+          }
         }
-        
+
         if (updateData.sort_order !== undefined) {
           taskUpdateData.sort_order = updateData.sort_order;
+        }
+
+        if (updateData.frequency !== undefined) {
+          // Validate frequency if provided
+          if (updateData.frequency !== null && !['daily', 'weekly', 'monthly'].includes(updateData.frequency)) {
+            return res.status(400).json({
+              error: 'Frequency must be one of: daily, weekly, monthly'
+            });
+          }
+          taskUpdateData.frequency = updateData.frequency;
         }
 
         const updatedTask = await taskRepository.update(taskId, taskUpdateData);

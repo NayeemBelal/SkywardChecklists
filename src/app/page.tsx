@@ -27,7 +27,6 @@ export default function Home() {
       {/* Top navigation */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
         <div className="flex justify-between items-center">
-          <LanguageSwitcher />
           {mounted && (
             <button
               onClick={() => router.push(adminLoggedIn ? '/admin/sites' : '/login')}
@@ -36,6 +35,7 @@ export default function Home() {
               {adminLoggedIn ? t('dashboard') : t('admin') + ' ' + t('login')}
             </button>
           )}
+          <LanguageSwitcher />
         </div>
       </div>
 

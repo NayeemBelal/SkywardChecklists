@@ -39,7 +39,8 @@ class RoomTemplateService {
         description: tasks[i].description,
         description_es: tasks[i].description_es,
         task_description: tasks[i].task_description,
-        sort_order: tasks[i].sort_order ?? i
+        sort_order: tasks[i].sort_order ?? i,
+        frequency: tasks[i].frequency
       };
       const createdTask = await this.roomTemplateRepository.createTemplateTask(taskData);
       createdTasks.push(createdTask);
@@ -74,7 +75,8 @@ class RoomTemplateService {
           description: tasks[i].description,
           description_es: tasks[i].description_es,
           task_description: tasks[i].task_description,
-          sort_order: tasks[i].sort_order ?? i
+          sort_order: tasks[i].sort_order ?? i,
+          frequency: tasks[i].frequency
         };
         await this.roomTemplateRepository.createTemplateTask(taskData);
       }
@@ -122,6 +124,7 @@ class RoomTemplateService {
           description_es: newTasks[i].description_es,
           task_description: newTasks[i].task_description,
           sort_order: newTasks[i].sort_order ?? i,
+          frequency: newTasks[i].frequency,
           room_template_id: templateId
         };
         await this.taskRepository.create(taskData);
@@ -206,7 +209,8 @@ class RoomTemplateService {
         description: templateTask.description,
         description_es: templateTask.description_es,
         task_description: templateTask.task_description,
-        sort_order: templateTask.sort_order
+        sort_order: templateTask.sort_order,
+        frequency: templateTask.frequency
       });
       tasks.push(task);
     }
@@ -224,7 +228,8 @@ class RoomTemplateService {
       description: taskData.description,
       description_es: taskData.description_es,
       task_description: taskData.task_description,
-      sort_order: taskData.sort_order ?? maxSortOrder + 1
+      sort_order: taskData.sort_order ?? maxSortOrder + 1,
+      frequency: taskData.frequency
     });
   }
 

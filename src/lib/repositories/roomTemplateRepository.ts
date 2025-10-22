@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { RoomTemplate, RoomTemplateTask, RoomTemplateWithTasks } from '@/types';
+import { RoomTemplate, RoomTemplateTask, RoomTemplateWithTasks, TaskFrequency } from '@/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export class RoomTemplateRepository {
@@ -177,7 +177,7 @@ export class RoomTemplateRepository {
     if (error) throw error;
   }
 
-  async updateTasksFromTemplateTask(templateTaskId: number, taskData: { description?: string; description_es?: string | null; task_description?: string }): Promise<void> {
+  async updateTasksFromTemplateTask(templateTaskId: number, taskData: { description?: string; description_es?: string | null; task_description?: string; frequency?: TaskFrequency | null }): Promise<void> {
     // Find the template task to get its room_template_id
     const { data: templateTask, error: fetchError } = await this.client
       .from('app_tasks')
@@ -201,7 +201,7 @@ export class RoomTemplateRepository {
     const roomIds = rooms.map(r => r.id);
 
     // Update all tasks in these rooms that match the sort_order
-    const updates: { description?: string; description_es?: string | null; task_description?: string; updated_at: string } = {
+    const updates: { description?: string; description_es?: string | null; task_description?: string; frequency?: TaskFrequency | null; updated_at: string } = {
       updated_at: new Date().toISOString()
     };
 
@@ -215,6 +215,10 @@ export class RoomTemplateRepository {
 
     if (taskData.task_description !== undefined) {
       updates.task_description = taskData.task_description;
+    }
+
+    if (taskData.frequency !== undefined) {
+      updates.frequency = taskData.frequency;
     }
 
     const { error: updateError } = await this.client
