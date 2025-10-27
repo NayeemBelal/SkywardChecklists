@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
-import { Site, SiteFormData, Zone, Employee, EmployeeAssignmentHierarchy } from '@/types';
+import { Site, SiteFormData, Zone, Room, Employee, EmployeeAssignmentHierarchy } from '@/types';
 import { useSites } from '@/hooks/useSites';
 import { useZones } from '@/hooks/useZones';
+import { useRooms } from '@/hooks/useRooms';
 import { useEmployeeAssignments } from '@/hooks/useEmployeeAssignments';
 import { SiteList } from '@/components/admin/SiteList';
 import { SiteForm } from '@/components/admin/SiteForm';
@@ -24,18 +25,23 @@ export default function SitesPage() {
   const [activeTab, setActiveTab] = useState<'sites' | 'employees'>('sites');
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
   const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [showZoneSelector, setShowZoneSelector] = useState(false);
+  const [showRoomSelector, setShowRoomSelector] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [topSearchResults, setTopSearchResults] = useState<Employee[]>([]);
   const [topSearchLoading, setTopSearchLoading] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedEmployeeHierarchy, setSelectedEmployeeHierarchy] = useState<EmployeeAssignmentHierarchy | null>(null);
-  
+
   // Employee assignment hooks
   const {
     assignEmployeeToZone,
     removeEmployeeFromZone,
+    assignEmployeeToRoom,
+    removeEmployeeFromRoom,
     getEmployeesWithZoneAssignmentStatus,
+    getEmployeesWithRoomAssignmentStatus,
     getEmployeeAssignments,
     getEmployeeAssignmentHierarchy,
     searchEmployees
@@ -43,6 +49,9 @@ export default function SitesPage() {
 
   // Zones hook for the selected site
   const { zones: siteZones, loading: zonesLoading, fetchZonesBySite } = useZones();
+
+  // Rooms hook for the selected zone
+  const { rooms: zoneRooms, loading: roomsLoading, fetchRoomsByZone } = useRooms();
 
   // Check authentication on page load
   useEffect(() => {
@@ -107,28 +116,63 @@ export default function SitesPage() {
 
   const handleZoneSelect = (zone: Zone) => {
     setSelectedZone(zone);
+    setSelectedRoom(null);
+    setShowRoomSelector(true);
+    // Fetch rooms for the selected zone
+    fetchRoomsByZone(zone.id);
+  };
+
+  const handleRoomSelect = (room: Room) => {
+    setSelectedRoom(room);
+  };
+
+  const handleBackToZones = () => {
+    setSelectedRoom(null);
+    setShowRoomSelector(false);
   };
 
   const handleBackToSites = () => {
     setSelectedSite(null);
     setSelectedZone(null);
+    setSelectedRoom(null);
     setShowZoneSelector(false);
+    setShowRoomSelector(false);
   };
 
   // Stable callback functions for EmployeeTab to prevent infinite re-renders
   const handleGetAllEmployeesWithAssignmentStatus = useCallback(async (assignedPage: number = 1, unassignedPage: number = 1, pageSize: number = 10) => {
-    if (!selectedSite || !selectedZone) return { 
-      assigned: [], 
-      unassigned: [], 
-      assignedTotal: 0, 
-      unassignedTotal: 0, 
-      assignedTotalPages: 1, 
-      unassignedTotalPages: 1, 
-      assignedCurrentPage: 1, 
-      unassignedCurrentPage: 1 
+    if (!selectedSite) return {
+      assigned: [],
+      unassigned: [],
+      assignedTotal: 0,
+      unassignedTotal: 0,
+      assignedTotalPages: 1,
+      unassignedTotalPages: 1,
+      assignedCurrentPage: 1,
+      unassignedCurrentPage: 1
     };
-    return await getEmployeesWithZoneAssignmentStatus(selectedZone.id, assignedPage, unassignedPage, pageSize);
-  }, [getEmployeesWithZoneAssignmentStatus, selectedSite, selectedZone]);
+
+    // If room is selected, get room assignment status
+    if (selectedRoom) {
+      return await getEmployeesWithRoomAssignmentStatus(selectedRoom.id, assignedPage, unassignedPage, pageSize);
+    }
+
+    // If zone is selected (but no room), get zone assignment status
+    if (selectedZone) {
+      return await getEmployeesWithZoneAssignmentStatus(selectedZone.id, assignedPage, unassignedPage, pageSize);
+    }
+
+    return {
+      assigned: [],
+      unassigned: [],
+      assignedTotal: 0,
+      unassignedTotal: 0,
+      assignedTotalPages: 1,
+      unassignedTotalPages: 1,
+      assignedCurrentPage: 1,
+      unassignedCurrentPage: 1
+    };
+  }, [getEmployeesWithZoneAssignmentStatus, getEmployeesWithRoomAssignmentStatus, selectedSite, selectedZone, selectedRoom]);
 
   const handleGetEmployeeDetails = useCallback(async (employeeId: number) => {
     return await getEmployeeAssignments(employeeId);
@@ -389,7 +433,7 @@ export default function SitesPage() {
                     <p className="text-gray-500">{t('no_sites')}. {t('create_site')} first to manage employee assignments.</p>
                   )}
                 </>
-              ) : (
+              ) : !showRoomSelector ? (
                 /* Zone Selector */
                 <>
                   <div className="flex items-center justify-between mb-4">
@@ -428,6 +472,61 @@ export default function SitesPage() {
                     <p className="text-gray-500">{t('no_zones')} for this site. {t('create_zone')} first to manage employee assignments.</p>
                   )}
                 </>
+              ) : (
+                /* Room Selector */
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Select Zone or Room in {selectedZone?.name}
+                    </h3>
+                    <button
+                      onClick={handleBackToZones}
+                      className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:underline"
+                    >
+                      ← Back to Zones
+                    </button>
+                  </div>
+                  <div className="mb-4">
+                    <button
+                      onClick={() => setSelectedRoom(null)}
+                      className={`w-full p-4 border rounded-lg text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        !selectedRoom
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-300'
+                      }`}
+                    >
+                      <h4 className="font-medium text-gray-900">Assign to Entire Zone: {selectedZone?.name}</h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Assign employees directly to the zone level
+                      </p>
+                    </button>
+                  </div>
+                  <h4 className="text-md font-medium text-gray-800 mb-3">Or Select a Room:</h4>
+                  {roomsLoading ? (
+                    <p className="text-gray-500">Loading rooms...</p>
+                  ) : zoneRooms.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {zoneRooms.map((room) => (
+                        <button
+                          key={room.id}
+                          onClick={() => handleRoomSelect(room)}
+                          className={`p-4 border rounded-lg text-left hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            selectedRoom?.id === room.id
+                              ? 'border-green-500 bg-green-50'
+                              : 'border-gray-300'
+                          }`}
+                        >
+                          <h4 className="font-medium text-gray-900">{room.name}</h4>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {room.description || 'No description'}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No rooms in this zone. Create rooms first to manage room-level employee assignments.</p>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -457,40 +556,74 @@ export default function SitesPage() {
         ) : (
           /* Employee Management Tab */
           <div className="w-full">
-            {selectedSite && selectedZone ? (
-              <EmployeeTab
-                siteId={selectedSite.id}
-                assignmentType="zone"
-                targetId={selectedZone.id}
-                targetName={selectedZone.name}
-                hideSearch={true}
-                onAssignEmployee={async (employeeId: number) => {
-                  try {
-                    await assignEmployeeToZone(employeeId, selectedZone.id);
-                    setMessage({ type: 'success', text: t('employee_assigned') });
-                  } catch {
-                    setMessage({ type: 'error', text: t('operation_failed') });
-                  }
-                }}
-                onRemoveEmployee={async (employeeId: number) => {
-                  try {
-                    await removeEmployeeFromZone(employeeId, selectedZone.id);
-                    setMessage({ type: 'success', text: t('employee_unassigned') });
-                  } catch {
-                    setMessage({ type: 'error', text: t('operation_failed') });
-                  }
-                }}
-                onGetAllEmployeesWithAssignmentStatus={handleGetAllEmployeesWithAssignmentStatus}
-                onGetEmployeeDetails={handleGetEmployeeDetails}
-                onSearchEmployees={handleSearchEmployees}
-              />
+            {selectedSite && selectedZone && showRoomSelector ? (
+              // Show EmployeeTab for room or zone assignment
+              selectedRoom ? (
+                // Room-level assignment
+                <EmployeeTab
+                  siteId={selectedSite.id}
+                  assignmentType="room"
+                  targetId={selectedRoom.id}
+                  targetName={selectedRoom.name}
+                  hideSearch={true}
+                  onAssignEmployee={async (employeeId: number) => {
+                    try {
+                      await assignEmployeeToRoom(employeeId, selectedRoom.id);
+                      setMessage({ type: 'success', text: t('employee_assigned') });
+                    } catch {
+                      setMessage({ type: 'error', text: t('operation_failed') });
+                    }
+                  }}
+                  onRemoveEmployee={async (employeeId: number) => {
+                    try {
+                      await removeEmployeeFromRoom(employeeId, selectedRoom.id);
+                      setMessage({ type: 'success', text: t('employee_unassigned') });
+                    } catch {
+                      setMessage({ type: 'error', text: t('operation_failed') });
+                    }
+                  }}
+                  onGetAllEmployeesWithAssignmentStatus={handleGetAllEmployeesWithAssignmentStatus}
+                  onGetEmployeeDetails={handleGetEmployeeDetails}
+                  onSearchEmployees={handleSearchEmployees}
+                />
+              ) : (
+                // Zone-level assignment
+                <EmployeeTab
+                  siteId={selectedSite.id}
+                  assignmentType="zone"
+                  targetId={selectedZone.id}
+                  targetName={selectedZone.name}
+                  hideSearch={true}
+                  onAssignEmployee={async (employeeId: number) => {
+                    try {
+                      await assignEmployeeToZone(employeeId, selectedZone.id);
+                      setMessage({ type: 'success', text: t('employee_assigned') });
+                    } catch {
+                      setMessage({ type: 'error', text: t('operation_failed') });
+                    }
+                  }}
+                  onRemoveEmployee={async (employeeId: number) => {
+                    try {
+                      await removeEmployeeFromZone(employeeId, selectedZone.id);
+                      setMessage({ type: 'success', text: t('employee_unassigned') });
+                    } catch {
+                      setMessage({ type: 'error', text: t('operation_failed') });
+                    }
+                  }}
+                  onGetAllEmployeesWithAssignmentStatus={handleGetAllEmployeesWithAssignmentStatus}
+                  onGetEmployeeDetails={handleGetEmployeeDetails}
+                  onSearchEmployees={handleSearchEmployees}
+                />
+              )
             ) : (
               <div className="bg-white rounded-lg shadow p-6">
                 <p className="text-gray-500 text-center">
-                  {!selectedSite 
+                  {!selectedSite
                     ? t('select_site') + " above to manage employee assignments."
-                    : !selectedZone 
+                    : !selectedZone
                     ? t('select_zone') + " above to manage employee assignments."
+                    : !showRoomSelector
+                    ? "Select a zone or room above to manage employee assignments."
                     : t('loading')
                   }
                 </p>

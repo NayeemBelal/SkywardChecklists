@@ -18,9 +18,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'siteId must be a number' });
     }
 
-    // We only want employees assigned to a zone within this site
-    // Query app_zone_employees with inner joins to app_employees and app_zones, filter by site_id
-    const { data, error } = await supabase
+    // We want employees assigned to zones OR rooms within this site
+
+    // 1. Get employees assigned to zones in this site
+    const { data: zoneEmployeesData, error: zoneError } = await supabase
       .from('app_zone_employees')
       .select(`
         app_employees!inner(id, full_name),
@@ -28,14 +29,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       `)
       .eq('app_zones.site_id', siteIdNum);
 
-    if (error) {
+    if (zoneError) {
       return res.status(500).json({ error: 'Internal server error' });
     }
 
-    // Deduplicate employees by id in case they are assigned to multiple zones
+    // 2. Get employees assigned to rooms in zones in this site
+    const { data: roomEmployeesData, error: roomError } = await supabase
+      .from('app_room_employees')
+      .select(`
+        app_employees!inner(id, full_name),
+        app_rooms!inner(id, zone_id, app_zones!inner(id, site_id))
+      `)
+      .eq('app_rooms.app_zones.site_id', siteIdNum);
+
+    if (roomError) {
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+
+    // Deduplicate employees by id (they might be assigned to multiple zones/rooms)
     const seen = new Set<number>();
     const employees = [] as Array<{ id: number; full_name: string }>;
-    for (const row of data || []) {
+
+    // Add employees from zone assignments
+    for (const row of zoneEmployeesData || []) {
+      const emp = (row as Record<string, unknown>).app_employees as { id: number; full_name: string };
+      if (emp && !seen.has(emp.id)) {
+        seen.add(emp.id);
+        employees.push(emp);
+      }
+    }
+
+    // Add employees from room assignments
+    for (const row of roomEmployeesData || []) {
       const emp = (row as Record<string, unknown>).app_employees as { id: number; full_name: string };
       if (emp && !seen.has(emp.id)) {
         seen.add(emp.id);

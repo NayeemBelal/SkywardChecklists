@@ -169,6 +169,29 @@ export class EmployeeAssignmentService {
     return response.json();
   }
 
+  static async getEmployeesWithRoomAssignmentStatus(roomId: number, assignedPage: number = 1, unassignedPage: number = 1, pageSize: number = 10): Promise<{
+    assigned: Employee[],
+    unassigned: Employee[],
+    assignedTotal: number,
+    unassignedTotal: number,
+    assignedTotalPages: number,
+    unassignedTotalPages: number,
+    assignedCurrentPage: number,
+    unassignedCurrentPage: number
+  }> {
+    const response = await fetch(`${API_BASE}/employees/with-room-assignment-status/${roomId}?assignedPage=${assignedPage}&unassignedPage=${unassignedPage}&pageSize=${pageSize}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('supabase.auth.token')}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch employees with room assignment status');
+    }
+
+    return response.json();
+  }
+
   // Keep these methods for backward compatibility
   static async getAssignedEmployees(siteId: number): Promise<Employee[]> {
     const { assigned } = await this.getAllEmployeesWithAssignmentStatus(siteId);

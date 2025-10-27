@@ -38,9 +38,6 @@ export function ZoneDeleteModal({ zone, onConfirm, onCancel, loading }: ZoneDele
               Are you sure you want to delete the zone <strong>&ldquo;{zone.name}&rdquo;</strong>? 
               This action cannot be undone.
             </p>
-            <p className="text-sm text-red-600 mt-2">
-              <strong>Note:</strong> This zone cannot be deleted if it contains rooms.
-            </p>
           </div>
           <div className="flex justify-center space-x-3 px-4 py-3">
             <button

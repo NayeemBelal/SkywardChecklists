@@ -164,6 +164,29 @@ export const useEmployeeAssignments = () => {
     }
   }, []);
 
+  const getEmployeesWithRoomAssignmentStatus = useCallback(async (roomId: number, assignedPage: number = 1, unassignedPage: number = 1, pageSize: number = 10): Promise<{
+    assigned: Employee[],
+    unassigned: Employee[],
+    assignedTotal: number,
+    unassignedTotal: number,
+    assignedTotalPages: number,
+    unassignedTotalPages: number,
+    assignedCurrentPage: number,
+    unassignedCurrentPage: number
+  }> => {
+    try {
+      setLoading(true);
+      setError(null);
+      return await EmployeeAssignmentService.getEmployeesWithRoomAssignmentStatus(roomId, assignedPage, unassignedPage, pageSize);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch employees with room assignment status';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // Keep these methods for backward compatibility
   const getAssignedEmployees = useCallback(async (siteId: number): Promise<Employee[]> => {
     try {
@@ -220,6 +243,7 @@ export const useEmployeeAssignments = () => {
     getEmployeeAssignmentHierarchy,
     getAllEmployeesWithAssignmentStatus,
     getEmployeesWithZoneAssignmentStatus,
+    getEmployeesWithRoomAssignmentStatus,
     getAssignedEmployees,
     getUnassignedEmployees,
     searchEmployees,

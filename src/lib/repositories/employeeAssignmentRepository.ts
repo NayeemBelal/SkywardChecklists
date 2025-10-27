@@ -163,32 +163,61 @@ export class EmployeeAssignmentRepository {
       .select('*')
       .eq('id', employeeId)
       .single();
-    
+
     if (employeeError) throw employeeError;
 
-    // Get zone assignments (only zones assigned to this employee)
+    // Get zone assignments (zones directly assigned to this employee)
     const { data: zoneAssignments, error: zoneError } = await supabase
       .from('app_zone_employees')
       .select('zone_id')
       .eq('employee_id', employeeId);
-    
+
     if (zoneError) throw zoneError;
 
-    const zoneIds: number[] = zoneAssignments?.map(za => za.zone_id) || [];
-    
-    if (zoneIds.length === 0) {
+    const assignedZoneIds = new Set<number>(zoneAssignments?.map(za => za.zone_id) || []);
+
+    // Get room assignments (rooms directly assigned to this employee)
+    const { data: roomAssignments, error: roomError } = await supabase
+      .from('app_room_employees')
+      .select('room_id')
+      .eq('employee_id', employeeId);
+
+    if (roomError) throw roomError;
+
+    const assignedRoomIds = new Set<number>(roomAssignments?.map(ra => ra.room_id) || []);
+
+    // If no assignments at all, return empty
+    if (assignedZoneIds.size === 0 && assignedRoomIds.size === 0) {
       return {
         employee,
         sites: []
       };
     }
 
+    // Get all rooms that are assigned (to fetch their zone_id)
+    let assignedRooms: Room[] = [];
+    if (assignedRoomIds.size > 0) {
+      const { data: roomsData, error: roomsDataError } = await supabase
+        .from('app_rooms')
+        .select('*')
+        .in('id', Array.from(assignedRoomIds));
+
+      if (roomsDataError) throw roomsDataError;
+      assignedRooms = roomsData || [];
+    }
+
+    // Combine zone IDs: directly assigned zones + zones that contain assigned rooms
+    const allRelevantZoneIds = new Set<number>([
+      ...assignedZoneIds,
+      ...assignedRooms.map(r => r.zone_id)
+    ]);
+
     // Get zone details
     const { data: zones, error: zonesDetailsError } = await supabase
       .from('app_zones')
       .select('*')
-      .in('id', zoneIds);
-    
+      .in('id', Array.from(allRelevantZoneIds));
+
     if (zonesDetailsError) throw zonesDetailsError;
 
     // Group zones by site_id
@@ -199,27 +228,26 @@ export class EmployeeAssignmentRepository {
       .from('app_sites')
       .select('*')
       .in('id', siteIds);
-    
+
     if (sitesError) throw sitesError;
 
     // Get all rooms for these zones
-    const { data: rooms, error: roomsError } = await supabase
+    const { data: allRooms, error: allRoomsError } = await supabase
       .from('app_rooms')
       .select('*')
-      .in('zone_id', zoneIds);
-    
-    if (roomsError) throw roomsError;
+      .in('zone_id', Array.from(allRelevantZoneIds));
 
-    // Get all tasks for these rooms
-    const roomIds = rooms?.map(r => r.id) || [];
+    if (allRoomsError) throw allRoomsError;
+
+    // Get all tasks for assigned rooms only
     let tasks: Task[] = [];
-    if (roomIds.length > 0) {
+    if (assignedRoomIds.size > 0) {
       const { data: tasksData, error: tasksError } = await supabase
         .from('app_tasks')
         .select('*')
-        .in('room_id', roomIds)
+        .in('room_id', Array.from(assignedRoomIds))
         .order('sort_order');
-      
+
       if (tasksError) throw tasksError;
       tasks = tasksData || [];
     }
@@ -233,13 +261,17 @@ export class EmployeeAssignmentRepository {
           .filter(zone => zone.site_id === site.id)
           .map(zone => ({
             zone,
-            rooms: (rooms || [])
-              .filter(room => room.zone_id === zone.id)
+            isDirectlyAssigned: assignedZoneIds.has(zone.id),
+            rooms: (allRooms || [])
+              .filter(room => room.zone_id === zone.id && assignedRoomIds.has(room.id))
               .map(room => ({
                 room,
+                isDirectlyAssigned: assignedRoomIds.has(room.id),
                 tasks: tasks.filter(task => task.room_id === room.id)
               }))
           }))
+          // Only include zones that are either directly assigned or have assigned rooms
+          .filter(zoneData => zoneData.isDirectlyAssigned || zoneData.rooms.length > 0)
       }))
     };
 
@@ -472,7 +504,87 @@ export class EmployeeAssignmentRepository {
       .delete()
       .eq('employee_id', employeeId)
       .eq('room_id', roomId);
-    
+
     if (error) throw error;
+  }
+
+  async getEmployeesWithRoomAssignmentStatus(roomId: number, assignedPage: number = 1, unassignedPage: number = 1, pageSize: number = 10): Promise<{
+    assigned: Employee[],
+    unassigned: Employee[],
+    assignedTotal: number,
+    unassignedTotal: number,
+    assignedTotalPages: number,
+    unassignedTotalPages: number,
+    assignedCurrentPage: number,
+    unassignedCurrentPage: number
+  }> {
+    // Get all employees first (we need to determine assignment status)
+    const { data: allEmployees, error: allError } = await supabase
+      .from('app_employees')
+      .select('*')
+      .order('full_name');
+
+    if (allError) throw allError;
+
+    if (!allEmployees || allEmployees.length === 0) {
+      return {
+        assigned: [],
+        unassigned: [],
+        assignedTotal: 0,
+        unassignedTotal: 0,
+        assignedTotalPages: 0,
+        unassignedTotalPages: 0,
+        assignedCurrentPage: 1,
+        unassignedCurrentPage: 1
+      };
+    }
+
+    // Get employees assigned to this specific room
+    const { data: roomAssignments, error: roomError } = await supabase
+      .from('app_room_employees')
+      .select('employee_id')
+      .eq('room_id', roomId);
+
+    if (roomError) throw roomError;
+
+    const assignedEmployeeIds = new Set<number>();
+    if (roomAssignments) {
+      roomAssignments.forEach(item => assignedEmployeeIds.add(item.employee_id));
+    }
+
+    // Split employees into assigned and unassigned
+    const allAssigned: Employee[] = [];
+    const allUnassigned: Employee[] = [];
+
+    allEmployees.forEach(emp => {
+      if (assignedEmployeeIds.has(emp.id)) {
+        allAssigned.push(emp);
+      } else {
+        allUnassigned.push(emp);
+      }
+    });
+
+    // Calculate pagination for assigned employees
+    const assignedTotal = allAssigned.length;
+    const assignedTotalPages = Math.ceil(assignedTotal / pageSize);
+    const assignedOffset = (assignedPage - 1) * pageSize;
+    const assigned = allAssigned.slice(assignedOffset, assignedOffset + pageSize);
+
+    // Calculate pagination for unassigned employees
+    const unassignedTotal = allUnassigned.length;
+    const unassignedTotalPages = Math.ceil(unassignedTotal / pageSize);
+    const unassignedOffset = (unassignedPage - 1) * pageSize;
+    const unassigned = allUnassigned.slice(unassignedOffset, unassignedOffset + pageSize);
+
+    return {
+      assigned,
+      unassigned,
+      assignedTotal,
+      unassignedTotal,
+      assignedTotalPages,
+      unassignedTotalPages,
+      assignedCurrentPage: assignedPage,
+      unassignedCurrentPage: unassignedPage
+    };
   }
 }

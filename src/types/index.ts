@@ -167,8 +167,10 @@ export interface EmployeeAssignmentHierarchy {
     site: Site;
     zones: {
       zone: Zone;
+      isDirectlyAssigned: boolean;
       rooms: {
         room: Room;
+        isDirectlyAssigned: boolean;
         tasks: Task[];
       }[];
     }[];
